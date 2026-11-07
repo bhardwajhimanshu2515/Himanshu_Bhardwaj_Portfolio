@@ -6,7 +6,7 @@ const github = "https://github.com/bhardwajhimanshu2515";
 const medium = "https://medium.com/@bhardwajhimanshu2515";
 const postlineRepo = "https://github.com/bhardwajhimanshu2515/postline";
 const fxTargets = [
-  [".hero-copy > *", "up"], [".engineering-core", "zoom"], [".impact-strip > div", "flip"],
+  [".hero-copy > *", "up"], [".hero-portrait", "up"], [".engineering-core", "zoom"], [".impact-strip > div", "flip"],
   [".projects-head", "up"], [".postline-copy > :not(h2)", "up"], [".promo-frame", "zoom"], [".promo figcaption", "up"], ["#projects-title", "zoom"], [".postline-flow", "right"],
   [".thesis-title", "left"], [".thesis-points article", "flip"],
   [".lab-introduction > *", "left"], [".system-explorer", "right"],
@@ -111,7 +111,6 @@ function EngineeringCore() {
   return <div className="engineering-core">
     <div className="core-caption"><span>ENGINEERING AT EVERY LAYER</span><span>FIG. 001</span></div>
     <div className="core-stage">
-    <img className="core-portrait" src="/himanshu-cutout.webp" alt="" aria-hidden="true" width="467" height="810" fetchPriority="high" />
     <svg className={`core-diagram layer-${layer}`} viewBox="0 0 600 470" role="img" aria-label={`Full-stack architecture illustration. Selected layer: ${layers[layer][1]}`}>
       <defs>
         <linearGradient id="plane-fill" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#254945" stopOpacity=".7" /><stop offset="1" stopColor="#091914" stopOpacity=".9" /></linearGradient>
@@ -261,7 +260,8 @@ export default function Home() {
         <div className="workspace-path"><span><span aria-hidden="true">⌘</span> workspace</span><span>/</span><span>himanshu-bhardwaj</span><span>/</span><b>overview.tsx</b></div>
         <div className="hero-intro"><span className="eyebrow"><i /> SENIOR PRODUCT ENGINEER / FULL STACK</span><span className="location">NOIDA, INDIA · UTC +05:30</span></div>
         <div className="hero-grid">
-          <div className="hero-copy"><div className="hero-id"><img src="/himanshu-avatar.jpg" alt="Himanshu Bhardwaj" width="64" height="64" /><div><p className="hello">HIMANSHU BHARDWAJ</p><span className="hero-status"><i /> Open to freelance projects</span></div></div><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
+          <div className="hero-copy"><div className="hero-id"><p className="hello">HIMANSHU BHARDWAJ</p><span className="hero-status"><i /> Open to freelance projects</span></div><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
+          <figure className="hero-portrait"><img src="/himanshu-cutout.webp" alt="Himanshu Bhardwaj" width="467" height="810" fetchPriority="high" /></figure>
           <EngineeringCore />
         </div>
         <div className="impact-strip">{[["5+","Years of engineering experience"],["20%","Lower application load time¹"],["30%","Higher development efficiency¹"],["25%","Fewer system crashes¹"]].map(([metric,label],index) => <div key={metric}><span className="metric-index">0{index + 1} / {["EXPERIENCE","PERFORMANCE","VELOCITY","RELIABILITY"][index]}</span><strong>{metric}</strong><span>{label}</span></div>)}</div><p className="metric-note">¹ Results from my work on American Water at Smart Energy Water.</p>

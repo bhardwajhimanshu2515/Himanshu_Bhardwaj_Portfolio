@@ -253,11 +253,11 @@ html[data-theme=light] .theme-toggle .icon-moon{display:block}
 html[data-theme=light]{filter:invert(1) hue-rotate(180deg);background:#090c0b}
 html[data-theme=light] img,html[data-theme=light] video{filter:invert(1) hue-rotate(180deg)}
 @media(max-width:760px){.theme-toggle{width:34px;height:34px}}
-/* Portrait standing behind the hero diagram */
-.core-stage{position:relative;isolation:isolate}
-.core-portrait{position:absolute;z-index:-1;left:50%;top:50%;height:100%;width:auto;transform:translate(-50%,-50%);pointer-events:none;user-select:none;opacity:1;-webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent 96%);mask-image:linear-gradient(to bottom,#000 62%,transparent 96%);filter:drop-shadow(0 20px 40px #0008)}
-.core-stage:before{content:"";position:absolute;z-index:-2;left:50%;top:6%;width:62%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,#c7ef9122,transparent 68%)}
-.core-stage .core-plane path[fill="url(#plane-fill)"]{fill-opacity:.14}.core-stage .core-plane path[fill="#0e201a"]{fill-opacity:.35}
-.core-stage .core-plane:not(.selected){opacity:.38}
-html[data-theme=light] .core-portrait{filter:invert(1) hue-rotate(180deg)}
-
+/* Portrait standing between the hero copy and the diagram */
+.hero-grid{grid-template-columns:minmax(0,1fr) minmax(210px,.5fr) minmax(0,1.05fr);gap:28px;align-items:center}
+.hero-portrait{margin:0;align-self:end;justify-self:center;position:relative;height:100%;max-height:620px;min-height:440px;display:flex;align-items:flex-end;pointer-events:none}
+.hero-portrait:before{content:"";position:absolute;left:50%;bottom:6%;width:150%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,#c7ef911c,transparent 64%);z-index:-1}
+.hero-portrait img{display:block;height:100%;width:auto;max-width:none;object-fit:contain;object-position:bottom;-webkit-mask-image:linear-gradient(to bottom,#000 70%,transparent 99%);mask-image:linear-gradient(to bottom,#000 70%,transparent 99%)}
+.hero-id{display:block;margin-bottom:28px}.hero-id .hello{margin-bottom:10px}
+@media(max-width:1100px){.hero-grid{grid-template-columns:1fr minmax(200px,.7fr);gap:32px}.hero-portrait{min-height:420px}.hero-grid .engineering-core{grid-column:1/-1;max-width:680px;width:100%;justify-self:center}}
+@media(max-width:760px){.hero-grid{grid-template-columns:1fr}.hero-portrait{height:400px;min-height:0;margin-block:-10px -24px}.hero-grid .engineering-core{grid-column:auto}}
