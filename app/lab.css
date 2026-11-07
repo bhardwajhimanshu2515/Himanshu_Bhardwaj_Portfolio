@@ -255,9 +255,9 @@ html[data-theme=light] img,html[data-theme=light] video{filter:invert(1) hue-rot
 @media(max-width:760px){.theme-toggle{width:34px;height:34px}}
 /* Portrait standing behind the hero diagram */
 .core-stage{position:relative;isolation:isolate}
-.core-portrait{position:absolute;z-index:-1;left:50%;bottom:4%;height:128%;width:auto;transform:translateX(-50%);pointer-events:none;user-select:none;opacity:.92;-webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent 96%);mask-image:linear-gradient(to bottom,#000 62%,transparent 96%);filter:drop-shadow(0 20px 40px #0008)}
-.core-stage:before{content:"";position:absolute;z-index:-2;left:50%;top:-8%;width:62%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,#c7ef9122,transparent 68%)}
-.core-stage .core-plane path[fill="url(#plane-fill)"]{fill-opacity:.45}
+.core-portrait{position:absolute;z-index:-1;left:50%;top:50%;height:100%;width:auto;transform:translate(-50%,-50%);pointer-events:none;user-select:none;opacity:1;-webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent 96%);mask-image:linear-gradient(to bottom,#000 62%,transparent 96%);filter:drop-shadow(0 20px 40px #0008)}
+.core-stage:before{content:"";position:absolute;z-index:-2;left:50%;top:6%;width:62%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,#c7ef9122,transparent 68%)}
+.core-stage .core-plane path[fill="url(#plane-fill)"]{fill-opacity:.14}.core-stage .core-plane path[fill="#0e201a"]{fill-opacity:.35}
 .core-stage .core-plane:not(.selected){opacity:.38}
 html[data-theme=light] .core-portrait{filter:invert(1) hue-rotate(180deg)}
-@media(max-width:760px){.core-portrait{height:118%}}
+
