@@ -7,7 +7,7 @@ const medium = "https://medium.com/@bhardwajhimanshu2515";
 const postlineRepo = "https://github.com/bhardwajhimanshu2515/postline";
 const fxTargets = [
   [".hero-copy > *", "up"], [".engineering-core", "zoom"], [".impact-strip > div", "flip"],
-  [".projects-head", "up"], [".postline-copy > :not(h2)", "up"], ["#projects-title", "zoom"], [".postline-flow", "right"],
+  [".projects-head", "up"], [".postline-copy > :not(h2)", "up"], [".promo-frame", "zoom"], [".promo figcaption", "up"], ["#projects-title", "zoom"], [".postline-flow", "right"],
   [".thesis-title", "left"], [".thesis-points article", "flip"],
   [".lab-introduction > *", "left"], [".system-explorer", "right"],
   [".section-aside > *", "left"], [".career-log .role", "right"],
@@ -70,6 +70,10 @@ function Projects() {
         <div className="flow-foot"><span>Supports text, articles, images, PDF carousels, video, multi-image, polls and reshares</span></div>
       </div>
     </div>
+    <figure className="promo">
+      <div className="promo-frame"><video controls playsInline preload="none" poster="/postline-promo-poster.jpg" aria-label="Postline promo video, 32 seconds, with music"><source src="/postline-promo.mp4" type="video/mp4" /></video></div>
+      <figcaption><span className="eyebrow">WATCH / 32 SECONDS</span><p>Postline in half a minute: write in Claude, Postline holds it, it goes live on time. Every frame and every note was made in code.</p></figcaption>
+    </figure>
     <div className="thesis">
       <div className="thesis-title"><span className="eyebrow">WHAT I BELIEVE</span><h2>AI is the same for everyone.<br /><em>Experience isn’t.</em></h2></div>
       <div className="thesis-points">
