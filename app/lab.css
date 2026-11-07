@@ -200,3 +200,24 @@ footer{border-top-color:#425735;padding-block:27px;color:#90a27d}
 @media(max-width:760px){.projects{padding:65px 0}.postline-grid{grid-template-columns:1fr;gap:40px}.postline-facts{grid-template-columns:1fr 1fr}.postline-facts div:nth-child(3){padding-left:0;border-left:0}.postline-facts div:nth-child(-n+2){border-bottom:1px solid #34412f}.flow-rail button{font-size:9px;padding:13px 8px;flex-direction:column;align-items:flex-start;gap:4px}.flow-readout{padding:24px 20px}.thesis-points{grid-template-columns:1fr}.thesis-points article{border-right:0;border-bottom:1px solid #3b4b30}.thesis-points article:last-child{border-bottom:0}.thesis-title h2{font-size:32px}.connection-routes{grid-template-columns:1fr}.connection-routes a:not(:last-child){border-right:0;border-bottom:1px solid #34412f}}
 @media(prefers-reduced-motion:reduce){.flow-readout{animation:none}}
 @media print{.postline-flow,.flow-rail{display:none!important}.postline-copy h2 span{color:#333}.thesis-points{background:white}}
+/* 3D entrances: hidden only once JS has added .fx, so content shows without JS */
+html.fx [data-fx]{opacity:0;transition:opacity .9s cubic-bezier(.2,.7,.2,1) var(--d,0s),transform 1.15s cubic-bezier(.16,1,.3,1) var(--d,0s),filter .9s ease var(--d,0s);will-change:transform,opacity;filter:blur(6px);backface-visibility:hidden}
+html.fx [data-fx=up]{transform:perspective(900px) translate3d(0,90px,-180px) rotateX(32deg)}
+html.fx [data-fx=left]{transform:perspective(1000px) translate3d(-140px,30px,-240px) rotateY(-34deg)}
+html.fx [data-fx=right]{transform:perspective(1000px) translate3d(140px,30px,-240px) rotateY(34deg)}
+html.fx [data-fx=zoom]{transform:perspective(900px) translate3d(0,0,-650px) scale(.55) rotateX(14deg)}
+html.fx [data-fx=flip]{transform:perspective(800px) translate3d(0,60px,0) rotateX(-85deg);transform-origin:50% 0}
+html.fx [data-fx].in{opacity:1;transform:none;filter:none}
+html.fx [data-fx].tilting{transition:transform .18s ease-out,opacity .9s,filter .9s}
+.postline-flow,.system-explorer,.stack-workbench,.connection-panel{transform-style:preserve-3d}
+/* Postline wordmark: letters fly in from depth */
+#projects-title{perspective:700px}
+#projects-title b{display:inline-block;font-weight:inherit}
+#projects-title b.lime{color:#c5ed96}
+html.fx #projects-title b{opacity:0;transform:translate3d(calc((var(--i) - 3.5) * 60px),-120px,-500px) rotateX(90deg) rotateZ(calc((var(--i) - 3.5) * 12deg))}
+html.fx #projects-title.in b{animation:letter-in 1s cubic-bezier(.16,1,.3,1) calc(.15s + var(--i) * .07s) both}
+@keyframes letter-in{to{opacity:1;transform:none}}
+html.fx #projects-title.in b.lime{animation:letter-in 1s cubic-bezier(.16,1,.3,1) calc(.15s + var(--i) * .07s) both,lime-glow 2.4s ease 1.4s}
+@keyframes lime-glow{0%,100%{text-shadow:none}40%{text-shadow:0 0 28px #c5ed9688}}
+@media(prefers-reduced-motion:reduce){html.fx [data-fx],html.fx #projects-title b{opacity:1!important;transform:none!important;filter:none!important;animation:none!important;transition:none!important}}
+@media print{html.fx [data-fx],html.fx #projects-title b{opacity:1!important;transform:none!important;filter:none!important}}

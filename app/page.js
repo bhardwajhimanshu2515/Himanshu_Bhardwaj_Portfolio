@@ -5,6 +5,46 @@ const linkedin = "https://www.linkedin.com/in/mern-full-stack-developer";
 const github = "https://github.com/bhardwajhimanshu2515";
 const medium = "https://medium.com/@bhardwajhimanshu2515";
 const postlineRepo = "https://github.com/bhardwajhimanshu2515/postline";
+const fxTargets = [
+  [".hero-copy > *", "up"], [".engineering-core", "zoom"], [".impact-strip > div", "flip"],
+  [".projects-head", "up"], [".postline-copy > :not(h2)", "up"], ["#projects-title", "zoom"], [".postline-flow", "right"],
+  [".thesis-title", "left"], [".thesis-points article", "flip"],
+  [".lab-introduction > *", "left"], [".system-explorer", "right"],
+  [".section-aside > *", "left"], [".career-log .role", "right"],
+  [".method-heading > *", "up"], [".method-pipeline article", "flip"], [".method-return", "up"],
+  [".stack-workbench", "zoom"], [".education", "up"],
+  [".contact > div:first-child > *", "left"], [".connection-panel", "right"],
+];
+function useFx3D() {
+  useEffect(() => {
+    const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    if (reduce || !("IntersectionObserver" in window)) return;
+    const root = document.documentElement;
+    const seen = new Set();
+    fxTargets.forEach(([selector, kind]) => document.querySelectorAll(selector).forEach(el => {
+      if (seen.has(el)) return; seen.add(el);
+      const siblings = [...el.parentElement.children].filter(c => c.matches(selector));
+      el.dataset.fx = kind;
+      el.style.setProperty("--d", `${Math.min(siblings.indexOf(el), 6) * 0.09}s`);
+    }));
+    root.classList.add("fx");
+    const io = new IntersectionObserver(entries => entries.forEach(entry => {
+      if (entry.isIntersecting) { entry.target.classList.add("in"); io.unobserve(entry.target); }
+    }), { threshold: 0.12, rootMargin: "0px 0px -6% 0px" });
+    seen.forEach(el => io.observe(el));
+    const tiltables = document.querySelectorAll(".postline-flow, .system-explorer, .stack-workbench, .connection-panel");
+    const move = event => {
+      const el = event.currentTarget; if (!el.classList.contains("in")) return;
+      const r = el.getBoundingClientRect();
+      const x = (event.clientX - r.left) / r.width - 0.5, y = (event.clientY - r.top) / r.height - 0.5;
+      el.classList.add("tilting");
+      el.style.transform = `perspective(1100px) rotateX(${(-y * 7).toFixed(2)}deg) rotateY(${(x * 9).toFixed(2)}deg) translateZ(10px)`;
+    };
+    const leave = event => { event.currentTarget.style.transform = ""; event.currentTarget.classList.remove("tilting"); };
+    if (window.matchMedia("(hover: hover)").matches) tiltables.forEach(el => { el.addEventListener("mousemove", move); el.addEventListener("mouseleave", leave); });
+    return () => { io.disconnect(); root.classList.remove("fx"); tiltables.forEach(el => { el.removeEventListener("mousemove", move); el.removeEventListener("mouseleave", leave); }); };
+  }, []);
+}
 function Projects() {
   const [step, setStep] = useState(0);
   const flow = [
@@ -17,7 +57,7 @@ function Projects() {
     <div className="projects-head"><span className="eyebrow">FEATURED PROJECT / 000</span><span className="projects-status"><i /> Submitted to the Claude Connectors Directory</span></div>
     <div className="postline-grid">
       <div className="postline-copy">
-        <h2 id="projects-title">Post<span>line</span></h2>
+        <h2 id="projects-title" aria-label="Postline">{"Postline".split("").map((ch,i)=><b key={i} aria-hidden="true" className={i>3?"lime":""} style={{"--i":i}}>{ch}</b>)}</h2>
         <p className="postline-lede">A Claude connector that writes, schedules, publishes, edits and deletes LinkedIn posts. Tell Claude “post this Monday at 9 am” and close the laptop. It goes live on time.</p>
         <div className="postline-facts">{facts.map(([n,l])=><div key={l}><strong>{n}</strong><span>{l}</span></div>)}</div>
         <div className="postline-stack">{["TypeScript","Model Context Protocol","OAuth 2.1","Cloudflare Workers","D1 + KV","Cron","LinkedIn API"].map(t=><span key={t}>{t}</span>)}</div>
@@ -186,6 +226,7 @@ function ConnectionPanel() {
 }
 export default function Home() {
   const [menu, setMenu] = useState(false);
+  useFx3D();
   return <>
     <a className="skip" href="#overview">Skip to content</a>
     <header className="header">
