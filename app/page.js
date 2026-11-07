@@ -7,7 +7,7 @@ const medium = "https://medium.com/@bhardwajhimanshu2515";
 const postlineRepo = "https://github.com/bhardwajhimanshu2515/postline";
 const fxTargets = [
   [".hero-copy > *", "up"], [".engineering-core", "zoom"], [".impact-strip > div", "flip"],
-  [".projects-head", "up"], [".postline-copy > :not(h2)", "up"], [".promo-frame", "zoom"], [".promo figcaption", "up"], [".desk3d", "left"], ["#projects-title", "zoom"], [".postline-flow", "right"],
+  [".projects-head", "up"], [".postline-copy > :not(h2)", "up"], [".promo-frame", "zoom"], [".promo figcaption", "up"], ["#projects-title", "zoom"], [".postline-flow", "right"],
   [".thesis-title", "left"], [".thesis-points article", "flip"],
   [".lab-introduction > *", "left"], [".system-explorer", "right"],
   [".section-aside > *", "left"], [".career-log .role", "right"],
@@ -74,10 +74,6 @@ function Projects() {
       <div className="promo-frame"><video controls playsInline preload="none" poster="/postline-promo-poster.jpg" aria-label="Postline promo video, 32 seconds, with music"><source src="/postline-promo.mp4" type="video/mp4" /></video></div>
       <figcaption><span className="eyebrow">WATCH / 32 SECONDS</span><p>Postline in half a minute: write in Claude, Postline holds it, it goes live on time. Every frame and every note was made in code.</p></figcaption>
     </figure>
-    <a className="desk3d" href="https://3dcms.info/bhardwajhimanshu2515/sites/himanshu-coding-desk/" target="_blank" rel="noreferrer">
-      <img src="/desk-3d-preview.jpg" alt="A 3D avatar of Himanshu at his desk, coding and sipping coffee" width="640" height="400" loading="lazy" />
-      <div><span className="eyebrow">STEP INSIDE / 3D</span><h3>Meet me at my desk.</h3><p>A live 3D scene: one hand on the keyboard, the other on the coffee. Drag to look around.</p><b>Open the 3D desk ↗</b></div>
-    </a>
     <div className="thesis">
       <div className="thesis-title"><span className="eyebrow">WHAT I BELIEVE</span><h2>AI is the same for everyone.<br /><em>Experience isn’t.</em></h2></div>
       <div className="thesis-points">
@@ -158,7 +154,7 @@ function SystemExplorer() {
 function CommandPalette() {
   const ref = useRef(null);
   const [query, setQuery] = useState("");
-  const actions = [["Postline project", "#projects", "Navigate"], ["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Medium blog", medium, "External"], ["3D desk", "https://3dcms.info/bhardwajhimanshu2515/sites/himanshu-coding-desk/", "External"], ["Send an email", `mailto:${email}`, "Email"]];
+  const actions = [["Postline project", "#projects", "Navigate"], ["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Medium blog", medium, "External"], ["Send an email", `mailto:${email}`, "Email"]];
   const open = () => { setQuery(""); if (!ref.current.open) ref.current.showModal(); };
   useEffect(() => {
     const keydown = (event) => {
