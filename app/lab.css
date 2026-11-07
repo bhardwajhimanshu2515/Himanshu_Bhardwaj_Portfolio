@@ -228,3 +228,36 @@ html.fx #projects-title.in b.lime{animation:letter-in 1s cubic-bezier(.16,1,.3,1
 .promo figcaption p{font-size:13px;line-height:1.8;color:var(--muted);margin-top:14px;max-width:300px}
 @media(max-width:760px){.promo{grid-template-columns:1fr;gap:20px;margin-top:45px}}
 @media print{.promo{display:none}}
+/* Portrait */
+.hero-id{display:flex;align-items:center;gap:16px;margin-bottom:28px}
+.hero-id img{width:64px;height:64px;object-fit:cover;border-radius:50%;border:1px solid #4a5d3c;box-shadow:0 0 0 4px #10170d,0 0 0 5px #2c3a25}
+.hero-id .hello{margin-bottom:8px}
+.hero-status{display:flex;align-items:center;gap:8px;font:9px var(--mono);letter-spacing:.06em;color:#a9bd96}
+.hero-status i{width:6px;height:6px;border-radius:50%;background:#c7ef91;box-shadow:0 0 10px #c7ef9188}
+.contact{grid-template-columns:minmax(200px,.62fr) 1fr 1.05fr;gap:56px}
+.contact-portrait{margin:0;border:1px solid #34412f;border-radius:6px;overflow:hidden;background:#10170d;align-self:center}
+.contact-portrait img{display:block;width:100%;height:auto;aspect-ratio:4/5;object-fit:cover}
+.contact-portrait figcaption{display:flex;flex-direction:column;gap:5px;padding:13px 15px;border-top:1px solid #34412f;font:9px var(--mono);color:#93a387}
+.contact-portrait figcaption b{font:500 13px Arial,Helvetica,sans-serif;color:var(--ink)}
+@media(max-width:1050px){.contact{grid-template-columns:1fr 1fr}.contact-portrait{grid-row:span 2;max-width:320px}}
+@media(max-width:760px){.contact{grid-template-columns:1fr}.contact-portrait{grid-row:auto;max-width:260px}.hero-id{gap:12px}.hero-id img{width:54px;height:54px}}
+@media print{.hero-id img,.contact-portrait,.theme-toggle{display:none!important}}
+/* Theme toggle */
+.theme-toggle{display:grid;place-items:center;width:36px;height:36px;flex-shrink:0;border:1px solid #3b4636;border-radius:2px;background:#141b14;color:#d2e1c2;padding:0}
+.theme-toggle:hover{border-color:#c7ef91}
+.theme-toggle svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.theme-toggle .icon-moon{display:none}
+html[data-theme=light] .theme-toggle .icon-sun{display:none}
+html[data-theme=light] .theme-toggle .icon-moon{display:block}
+/* Light theme: the dark palette is inverted as a whole, so every surface stays in proportion; photos and video are flipped back. */
+html[data-theme=light]{filter:invert(1) hue-rotate(180deg);background:#090c0b}
+html[data-theme=light] img,html[data-theme=light] video{filter:invert(1) hue-rotate(180deg)}
+@media(max-width:760px){.theme-toggle{width:34px;height:34px}}
+/* Portrait standing behind the hero diagram */
+.core-stage{position:relative;isolation:isolate}
+.core-portrait{position:absolute;z-index:-1;left:50%;bottom:4%;height:128%;width:auto;transform:translateX(-50%);pointer-events:none;user-select:none;opacity:.92;-webkit-mask-image:linear-gradient(to bottom,#000 62%,transparent 96%);mask-image:linear-gradient(to bottom,#000 62%,transparent 96%);filter:drop-shadow(0 20px 40px #0008)}
+.core-stage:before{content:"";position:absolute;z-index:-2;left:50%;top:-8%;width:62%;aspect-ratio:1;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,#c7ef9122,transparent 68%)}
+.core-stage .core-plane path[fill="url(#plane-fill)"]{fill-opacity:.45}
+.core-stage .core-plane:not(.selected){opacity:.38}
+html[data-theme=light] .core-portrait{filter:invert(1) hue-rotate(180deg)}
+@media(max-width:760px){.core-portrait{height:118%}}

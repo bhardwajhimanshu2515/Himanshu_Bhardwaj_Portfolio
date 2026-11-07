@@ -13,7 +13,7 @@ const fxTargets = [
   [".section-aside > *", "left"], [".career-log .role", "right"],
   [".method-heading > *", "up"], [".method-pipeline article", "flip"], [".method-return", "up"],
   [".stack-workbench", "zoom"], [".education", "up"],
-  [".contact > div:first-child > *", "left"], [".connection-panel", "right"],
+  [".contact-portrait", "zoom"], [".contact > div:nth-child(2) > *", "left"], [".connection-panel", "right"],
 ];
 function useFx3D() {
   useEffect(() => {
@@ -110,6 +110,8 @@ function EngineeringCore() {
   ];
   return <div className="engineering-core">
     <div className="core-caption"><span>ENGINEERING AT EVERY LAYER</span><span>FIG. 001</span></div>
+    <div className="core-stage">
+    <img className="core-portrait" src="/himanshu-cutout.webp" alt="" aria-hidden="true" width="467" height="810" fetchPriority="high" />
     <svg className={`core-diagram layer-${layer}`} viewBox="0 0 600 470" role="img" aria-label={`Full-stack architecture illustration. Selected layer: ${layers[layer][1]}`}>
       <defs>
         <linearGradient id="plane-fill" x1="0" y1="0" x2="1" y2="1"><stop stopColor="#254945" stopOpacity=".7" /><stop offset="1" stopColor="#091914" stopOpacity=".9" /></linearGradient>
@@ -130,6 +132,7 @@ function EngineeringCore() {
       </g>)}
       <g className="core-chip"><path d="M244 144L300 114L356 144V170L300 201L244 170Z" fill="#172d20" stroke="#b6e777" /><path d="M244 144L300 114L356 144L300 175Z" fill="url(#core-fill)" stroke="#d9ffa7" /><path d="M300 175V201" stroke="#8fae72" /><text x="300" y="151" textAnchor="middle" fill="#182b16" fontFamily="monospace" fontWeight="bold" fontSize="14">HB /</text></g>
     </svg>
+    </div>
     <div className="core-controls" aria-label="Explore the engineering layers">{layers.map(([number,name],index)=><button key={name} aria-pressed={layer===index} onClick={()=>setLayer(index)}><span>{number}</span>{name}</button>)}</div>
     <div className="core-readout" aria-live="polite"><span>{layers[layer][2]}</span><p>{layers[layer][3]}</p></div>
   </div>;
@@ -228,6 +231,18 @@ function ConnectionPanel() {
     <div className="resume-package"><div><span className="eyebrow">RÉSUMÉ PACKAGE</span><p>Experience, skills, and results.</p></div><div><a href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>PDF ↓</a><a href="/Himanshu-Bhardwaj-Resume-2026.docx" download>DOCX ↓</a></div></div>
   </div>;
 }
+function ThemeToggle() {
+  const flip = () => {
+    const root = document.documentElement;
+    const next = root.getAttribute("data-theme") === "light" ? "dark" : "light";
+    root.setAttribute("data-theme", next);
+    try { localStorage.setItem("theme", next); } catch {}
+  };
+  return <button className="theme-toggle" onClick={flip} aria-label="Switch between light and dark theme" title="Switch theme">
+    <svg className="icon-sun" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="4.5" /><path d="M12 2v2.5M12 19.5V22M2 12h2.5M19.5 12H22M4.9 4.9l1.8 1.8M17.3 17.3l1.8 1.8M4.9 19.1l1.8-1.8M17.3 6.7l1.8-1.8" /></svg>
+    <svg className="icon-moon" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 14.5A8 8 0 0 1 9.5 4a8 8 0 1 0 10.5 10.5Z" /></svg>
+  </button>;
+}
 export default function Home() {
   const [menu, setMenu] = useState(false);
   useFx3D();
@@ -237,6 +252,7 @@ export default function Home() {
       <a className="brand" href="#overview" aria-label="Himanshu Bhardwaj home"><span className="brand-icon">h/</span> himanshu<span className="brand-extension">.dev</span></a>
       <nav id="navigation" className={menu ? "open" : ""} aria-label="Main navigation">{["Overview","Projects","Experience","Expertise","Contact"].map(name => <a key={name} href={`#${name.toLowerCase()}`} onClick={() => setMenu(false)}>{name}</a>)}</nav>
       <CommandPalette />
+      <ThemeToggle />
       <a className="header-download" href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>Download résumé <span aria-hidden="true">↓</span></a>
       <button className="menu-toggle" aria-expanded={menu} aria-controls="navigation" onClick={() => setMenu(!menu)}>{menu ? "Close" : "Menu"}</button>
     </header>
@@ -245,7 +261,7 @@ export default function Home() {
         <div className="workspace-path"><span><span aria-hidden="true">⌘</span> workspace</span><span>/</span><span>himanshu-bhardwaj</span><span>/</span><b>overview.tsx</b></div>
         <div className="hero-intro"><span className="eyebrow"><i /> SENIOR PRODUCT ENGINEER / FULL STACK</span><span className="location">NOIDA, INDIA · UTC +05:30</span></div>
         <div className="hero-grid">
-          <div className="hero-copy"><p className="hello">HIMANSHU BHARDWAJ</p><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
+          <div className="hero-copy"><div className="hero-id"><img src="/himanshu-avatar.jpg" alt="Himanshu Bhardwaj" width="64" height="64" /><div><p className="hello">HIMANSHU BHARDWAJ</p><span className="hero-status"><i /> Open to freelance projects</span></div></div><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
           <EngineeringCore />
         </div>
         <div className="impact-strip">{[["5+","Years of engineering experience"],["20%","Lower application load time¹"],["30%","Higher development efficiency¹"],["25%","Fewer system crashes¹"]].map(([metric,label],index) => <div key={metric}><span className="metric-index">0{index + 1} / {["EXPERIENCE","PERFORMANCE","VELOCITY","RELIABILITY"][index]}</span><strong>{metric}</strong><span>{label}</span></div>)}</div><p className="metric-note">¹ Results from my work on American Water at Smart Energy Water.</p>
@@ -261,7 +277,7 @@ export default function Home() {
       </section>
       <EngineeringMethod />
       <section id="expertise" className="section wrap two-column"><div className="section-aside"><span className="eyebrow">TECHNICAL EXPERTISE / 004</span><h2>Depth across<br />the <em>stack.</em></h2><p>Select a discipline to explore its tools and where I’ve applied them.</p><div className="discipline-map" aria-hidden="true"><span>UI</span><i /><span>API</span><i /><span>DB</span></div></div><div><StackWorkbench /><div className="education"><div className="education-mark" aria-hidden="true">B.TECH<br /><span>CS / 2021</span></div><div><span className="eyebrow">FOUNDATION / EDUCATION</span><h3>B.Tech in Computer Science</h3><p>Poornima University</p><span className="education-date">August 2017 — June 2021</span></div></div></div></section>
-      <section id="contact" className="contact wrap"><div><span className="eyebrow">NEXT CONNECTION / 005</span><h2>Complex problem?<br /><em>Let’s build<br />the solution.</em></h2><p>Tell me about your team, your product, and the engineering challenge ahead.</p><a className="button contact-cta" href={`mailto:${email}`}>Start a conversation ↗</a><div className="contact-location"><span aria-hidden="true">◎</span> NOIDA, INDIA / UTC +05:30</div></div><ConnectionPanel /></section>
+      <section id="contact" className="contact wrap"><figure className="contact-portrait"><img src="/himanshu-portrait.jpg" alt="Portrait of Himanshu Bhardwaj" width="640" height="800" loading="lazy" /><figcaption><b>Himanshu Bhardwaj</b><span>Senior Product Engineer · Noida</span></figcaption></figure><div><span className="eyebrow">NEXT CONNECTION / 005</span><h2>Complex problem?<br /><em>Let’s build<br />the solution.</em></h2><p>Tell me about your team, your product, and the engineering challenge ahead.</p><a className="button contact-cta" href={`mailto:${email}`}>Start a conversation ↗</a><div className="contact-location"><span aria-hidden="true">◎</span> NOIDA, INDIA / UTC +05:30</div></div><ConnectionPanel /></section>
     </main>
     <footer className="wrap"><span>Himanshu Bhardwaj · {new Date().getFullYear()}</span><button onClick={() => window.print()}>Print this page ↗</button><a href="#overview">Back to top ↑</a></footer>
   </>;
