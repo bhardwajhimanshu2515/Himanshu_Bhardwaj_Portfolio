@@ -3,6 +3,41 @@ import { useEffect, useRef, useState } from "react";
 const email = "bhardwajhimanshu2515@gmail.com";
 const linkedin = "https://www.linkedin.com/in/mern-full-stack-developer";
 const github = "https://github.com/bhardwajhimanshu2515";
+const medium = "https://medium.com/@bhardwajhimanshu2515";
+const postlineRepo = "https://github.com/bhardwajhimanshu2515/postline";
+function Projects() {
+  const [step, setStep] = useState(0);
+  const flow = [
+    ["01", "You write", "Claude", "Draft the post with Claude, then say when it should go out: now, or Monday at 9 am."],
+    ["02", "Postline holds it", "Cloudflare Workers", "The post is encrypted (AES-256-GCM) and stored in D1. Claude only ever holds a Postline token, never the LinkedIn one."],
+    ["03", "It goes live", "LinkedIn Posts API", "A cron runs every minute and claims due posts atomically, so nothing posts twice. Failures retry after 2, 10 and 30 minutes."],
+  ];
+  const facts = [["7", "tools for Claude"], ["2", "OAuth flows"], ["36", "end-to-end checks"], ["8", "post types"]];
+  return <section id="projects" className="projects wrap" aria-labelledby="projects-title">
+    <div className="projects-head"><span className="eyebrow">FEATURED PROJECT / 000</span><span className="projects-status"><i /> Submitted to the Claude Connectors Directory</span></div>
+    <div className="postline-grid">
+      <div className="postline-copy">
+        <h2 id="projects-title">Post<span>line</span></h2>
+        <p className="postline-lede">A Claude connector that writes, schedules, publishes, edits and deletes LinkedIn posts. Tell Claude “post this Monday at 9 am” and close the laptop. It goes live on time.</p>
+        <div className="postline-facts">{facts.map(([n,l])=><div key={l}><strong>{n}</strong><span>{l}</span></div>)}</div>
+        <div className="postline-stack">{["TypeScript","Model Context Protocol","OAuth 2.1","Cloudflare Workers","D1 + KV","Cron","LinkedIn API"].map(t=><span key={t}>{t}</span>)}</div>
+        <div className="actions"><a className="button" href={postlineRepo} target="_blank" rel="noreferrer">View the code <span aria-hidden="true">↗</span></a><a className="text-link" href={medium} target="_blank" rel="noreferrer">Read how I built it <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <div className="postline-flow">
+        <div className="instrument-label"><span>HOW IT WORKS</span><span>CLAUDE → POSTLINE → LINKEDIN</span></div>
+        <div className="flow-rail" aria-label="Postline steps">{flow.map(([n,t],i)=><button key={n} aria-pressed={step===i} onClick={()=>setStep(i)}><span>{n}</span>{t}</button>)}</div>
+        <div className="flow-readout" key={step} aria-live="polite"><span className="layer-label">{flow[step][2]}</span><h3>{flow[step][1]}</h3><p>{flow[step][3]}</p></div>
+        <div className="flow-foot"><span>Supports text, articles, images, PDF carousels, video, multi-image, polls and reshares</span></div>
+      </div>
+    </div>
+    <div className="thesis">
+      <div className="thesis-title"><span className="eyebrow">WHAT I BELIEVE</span><h2>AI is the same for everyone.<br /><em>Experience isn’t.</em></h2></div>
+      <div className="thesis-points">
+        {[["Context","AI raised the floor for everyone. Knowing the product, the users and the constraints is what raises the ceiling."],["The right questions","A wrong requirement gets you a beautifully tested wrong product. Deciding what “correct” means is still the engineer’s job."],["Judgment","In Postline, the tools were the easy part. OAuth, token lifetimes, retries that never double-post and LinkedIn’s rules were the real work. That part comes from experience."]].map(([t,c],i)=><article key={t}><span>0{i+1}</span><h3>{t}</h3><p>{c}</p></article>)}
+      </div>
+    </div>
+  </section>;
+}
 const roles = [
   ["Jan 2025 — Present", "Senior Product Engineer — Full Stack", "Smart Energy Water Pvt. Ltd.", "Alectra Builder", "Engineer scalable applications using React, Node.js and .NET integrations. Improve component reusability, streamline MongoDB and SQL interactions, resolve production issues, and strengthen code quality through automated testing.", ["React", "Node.js", ".NET", "MongoDB", "SQL"]],
   ["Aug 2023 — Jan 2025", "Product Engineer — Full Stack", "Smart Energy Water Pvt. Ltd.", "American Water", "Reduced application load time by 20% and improved development efficiency by 30% through reusable UI components. Integrated enterprise .NET APIs, reduced testing errors by 30% using Jest and Enzyme, and reduced system crashes by 25% through targeted debugging.", ["React", "Redux", "REST APIs", "Jest", "Enzyme"]],
@@ -75,7 +110,7 @@ function SystemExplorer() {
 function CommandPalette() {
   const ref = useRef(null);
   const [query, setQuery] = useState("");
-  const actions = [["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Send an email", `mailto:${email}`, "Email"]];
+  const actions = [["Postline project", "#projects", "Navigate"], ["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Medium blog", medium, "External"], ["Send an email", `mailto:${email}`, "Email"]];
   const open = () => { setQuery(""); if (!ref.current.open) ref.current.showModal(); };
   useEffect(() => {
     const keydown = (event) => {
@@ -145,7 +180,7 @@ function ConnectionPanel() {
   return <div className="connection-panel">
     <div className="instrument-label"><span>CONNECTION DIRECTORY</span><span>HB /</span></div>
     <div className="connection-email"><span className="eyebrow">DIRECT CHANNEL</span><a href={`mailto:${email}`}>{email}</a><button onClick={copy}>Copy address <span aria-hidden="true">⧉</span></button><p role="status">{status}</p></div>
-    <div className="connection-routes"><a href={linkedin} target="_blank" rel="noreferrer"><span>01</span><div>LinkedIn<small>Professional profile</small></div><b>↗</b></a><a href={github} target="_blank" rel="noreferrer"><span>02</span><div>GitHub<small>Code & repositories</small></div><b>↗</b></a></div>
+    <div className="connection-routes"><a href={linkedin} target="_blank" rel="noreferrer"><span>01</span><div>LinkedIn<small>Professional profile</small></div><b>↗</b></a><a href={github} target="_blank" rel="noreferrer"><span>02</span><div>GitHub<small>Code & repositories</small></div><b>↗</b></a><a href={medium} target="_blank" rel="noreferrer"><span>03</span><div>Medium<small>Build stories & writing</small></div><b>↗</b></a></div>
     <div className="resume-package"><div><span className="eyebrow">RÉSUMÉ PACKAGE</span><p>Experience, skills, and results.</p></div><div><a href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>PDF ↓</a><a href="/Himanshu-Bhardwaj-Resume-2026.docx" download>DOCX ↓</a></div></div>
   </div>;
 }
@@ -155,7 +190,7 @@ export default function Home() {
     <a className="skip" href="#overview">Skip to content</a>
     <header className="header">
       <a className="brand" href="#overview" aria-label="Himanshu Bhardwaj home"><span className="brand-icon">h/</span> himanshu<span className="brand-extension">.dev</span></a>
-      <nav id="navigation" className={menu ? "open" : ""} aria-label="Main navigation">{["Overview","Experience","Expertise","Contact"].map(name => <a key={name} href={`#${name.toLowerCase()}`} onClick={() => setMenu(false)}>{name}</a>)}</nav>
+      <nav id="navigation" className={menu ? "open" : ""} aria-label="Main navigation">{["Overview","Projects","Experience","Expertise","Contact"].map(name => <a key={name} href={`#${name.toLowerCase()}`} onClick={() => setMenu(false)}>{name}</a>)}</nav>
       <CommandPalette />
       <a className="header-download" href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>Download résumé <span aria-hidden="true">↓</span></a>
       <button className="menu-toggle" aria-expanded={menu} aria-controls="navigation" onClick={() => setMenu(!menu)}>{menu ? "Close" : "Menu"}</button>
@@ -165,11 +200,12 @@ export default function Home() {
         <div className="workspace-path"><span><span aria-hidden="true">⌘</span> workspace</span><span>/</span><span>himanshu-bhardwaj</span><span>/</span><b>overview.tsx</b></div>
         <div className="hero-intro"><span className="eyebrow"><i /> SENIOR PRODUCT ENGINEER / FULL STACK</span><span className="location">NOIDA, INDIA · UTC +05:30</span></div>
         <div className="hero-grid">
-          <div className="hero-copy"><p className="hello">HIMANSHU BHARDWAJ</p><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href={github} target="_blank" rel="noreferrer">GitHub <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
+          <div className="hero-copy"><p className="hello">HIMANSHU BHARDWAJ</p><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
           <EngineeringCore />
         </div>
         <div className="impact-strip">{[["5+","Years of engineering experience"],["20%","Lower application load time¹"],["30%","Higher development efficiency¹"],["25%","Fewer system crashes¹"]].map(([metric,label],index) => <div key={metric}><span className="metric-index">0{index + 1} / {["EXPERIENCE","PERFORMANCE","VELOCITY","RELIABILITY"][index]}</span><strong>{metric}</strong><span>{label}</span></div>)}</div><p className="metric-note">¹ Results from my work on American Water at Smart Energy Water.</p>
       </section>
+      <Projects />
       <section className="project-lab wrap" aria-labelledby="lab-title">
         <div className="lab-introduction"><span className="eyebrow">INSIDE THE WORK / 001</span><h2 id="lab-title">Systems thinking.<br /><em>Production proof.</em></h2><p>Explore the technologies and outcomes behind three products I helped build.</p><div className="lab-index"><span>01—03</span><p>UTILITIES<br />HEALTHCARE<br />HR TECHNOLOGY</p></div><a href="#experience" className="text-link">Read the engineering history ↗</a></div>
         <SystemExplorer />

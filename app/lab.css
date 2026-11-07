@@ -162,3 +162,41 @@ footer{border-top-color:#425735;padding-block:27px;color:#90a27d}
 @media(max-width:760px){.method-heading{display:block}.method-heading h2{font-size:35px}.method-heading>p{margin-top:20px}.method-section{padding-block:55px}.method-pipeline article{padding:18px}.method-terminal{font-size:8px;gap:6px}.method-pipeline h3{font-size:15px;line-height:1.5}.method-pipeline p{min-height:100px;font-size:11px}.method-tech{font-size:7px}.career-map{margin-top:24px}.career-summary{margin-bottom:15px}.career-log .role{margin-left:17px;padding:24px 17px}.career-log h3{font-size:18px}.career-log .role-meta{font-size:8px;gap:5px;flex-wrap:wrap}.career-log .role-id{margin-right:4px}.stack-inspector{padding:20px;min-height:390px}.stack-heading h3{font-size:19px}.stack-selector button{padding:13px 10px}.stack-selector button b{display:none}.education{padding:20px;gap:15px}.education h3{font-size:15px}.education-mark{width:60px;height:60px;font-size:10px}.contact{grid-template-columns:1fr;padding-block:65px;gap:40px}.connection-email{padding:22px}.connection-email>a{font-size:13px}.instrument-label{font-size:7px;padding:14px 17px}}
 @media(prefers-reduced-motion:reduce){.method-glyph i{transition:none}.stack-inspector{animation:none}}
 @media print{body{background:white}.engineering-core,.project-lab,.hero-thesis,.career-map,.career-summary,.method-section,.discipline-map,.stack-selector,.stack-inspector,.connection-panel,.contact-cta,.contact-location,.education-mark{display:none!important}.role,.role:before{border-color:#bbb}.company,.product,.eyebrow{color:#333}.expertise-row,.education,.tags span{background:white;color:#333}.impact-strip strong,.impact-strip .metric-index{color:#222}.hello{color:black}.intro{color:#444}.career-log,.stack-workbench{background:white;border:0}.instrument-label{background:white;color:#222}.career-log .role{margin:0;padding:15px 0;border-left:0}.career-log .product{background:white;color:#333;border-color:#aaa}.print-stack{display:block}.print-stack p{font-size:10pt;line-height:1.5;margin:10px 0}.education-date{color:#333}.contact{display:block}}
+/* Featured project: Postline */
+.connection-routes{grid-template-columns:repeat(3,1fr)}.connection-routes a:first-child{border-right:0}.connection-routes a:not(:last-child){border-right:1px solid #34412f}
+.projects{padding:100px 0;border-bottom:1px solid var(--line)}
+.projects-head{display:flex;justify-content:space-between;align-items:center;gap:20px;flex-wrap:wrap}
+.projects-status{display:inline-flex;align-items:center;gap:9px;font:9px var(--mono);letter-spacing:.06em;color:#b5cda1;border:1px solid #3b4a2e;background:#141d10;padding:8px 12px}
+.projects-status i{width:7px;height:7px;border-radius:50%;background:#c7ef91;box-shadow:0 0 0 4px #c7ef9122}
+.postline-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:80px;align-items:center;margin-top:40px}
+.postline-copy h2{font-size:clamp(64px,8vw,112px);font-weight:500;letter-spacing:-.07em;line-height:.95}
+.postline-copy h2 span{color:#c5ed96}
+.postline-lede{font-size:17px;line-height:1.6;color:#ced8c7;margin-top:26px;max-width:470px}
+.postline-facts{display:grid;grid-template-columns:repeat(4,1fr);border-block:1px solid #34412f;margin:32px 0 22px}
+.postline-facts div{padding:18px 0}.postline-facts div+div{padding-left:16px;border-left:1px solid #34412f}
+.postline-facts strong{display:block;font:30px var(--mono);letter-spacing:-.06em;color:#e5eddc}
+.postline-facts span{display:block;font:8px var(--mono);letter-spacing:.06em;text-transform:uppercase;color:#8fa17d;margin-top:6px}
+.postline-stack{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:30px}
+.postline-stack span{font:9px var(--mono);color:#bed3a7;border:1px solid #3b4e2c;background:#182310;padding:7px 10px}
+.postline-flow{border:1px solid #425439;background:#0e150d;box-shadow:0 0 0 5px #0e160b,0 0 0 6px #293422,0 30px 90px #0005;min-width:0}
+.flow-rail{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid #34412f}
+.flow-rail button{background:#10170e;border:0;border-right:1px solid #34412f;padding:16px 12px;text-align:left;color:#9aac8a;font:10px var(--mono);display:flex;gap:9px;align-items:center}
+.flow-rail button:last-child{border-right:0}.flow-rail button span{font-size:8px;color:#77985d}
+.flow-rail button[aria-pressed=true]{background:#26371a;color:#d2efb4;box-shadow:inset 0 -2px #c3ef90}
+.flow-rail button:hover{color:#e0f8c5}
+.flow-readout{padding:34px 30px;min-height:230px;animation:arrive .25s both}
+.flow-readout h3{font-size:26px;font-weight:400;letter-spacing:-.04em;margin:12px 0 14px}
+.flow-readout p{font-size:13px;line-height:1.8;color:#a6b894;max-width:440px}
+.flow-foot{border-top:1px solid #34412f;background:#0a1008;padding:14px 20px;font:8px/1.7 var(--mono);color:#90a07f;letter-spacing:.04em}
+.thesis{display:grid;grid-template-columns:.9fr 1.3fr;gap:70px;margin-top:90px;padding-top:60px;border-top:1px solid #34412f}
+.thesis-title h2{font-size:40px;font-weight:400;letter-spacing:-.05em;line-height:1.15;margin-top:22px}
+.thesis-title h2 em{color:#8d9c80}
+.thesis-points{display:grid;grid-template-columns:repeat(3,1fr);border:1px solid #3b4b30;background:#0b1109}
+.thesis-points article{padding:24px;border-right:1px solid #3b4b30}.thesis-points article:last-child{border-right:0}
+.thesis-points span{font:9px var(--mono);color:#8aa16e}
+.thesis-points h3{font-size:17px;font-weight:400;letter-spacing:-.03em;margin:18px 0 10px;color:#d8e5cb}
+.thesis-points p{font-size:11px;line-height:1.8;color:#96a688}
+@media(max-width:1050px){.postline-grid{gap:45px}.thesis{grid-template-columns:1fr;gap:35px}}
+@media(max-width:760px){.projects{padding:65px 0}.postline-grid{grid-template-columns:1fr;gap:40px}.postline-facts{grid-template-columns:1fr 1fr}.postline-facts div:nth-child(3){padding-left:0;border-left:0}.postline-facts div:nth-child(-n+2){border-bottom:1px solid #34412f}.flow-rail button{font-size:9px;padding:13px 8px;flex-direction:column;align-items:flex-start;gap:4px}.flow-readout{padding:24px 20px}.thesis-points{grid-template-columns:1fr}.thesis-points article{border-right:0;border-bottom:1px solid #3b4b30}.thesis-points article:last-child{border-bottom:0}.thesis-title h2{font-size:32px}.connection-routes{grid-template-columns:1fr}.connection-routes a:not(:last-child){border-right:0;border-bottom:1px solid #34412f}}
+@media(prefers-reduced-motion:reduce){.flow-readout{animation:none}}
+@media print{.postline-flow,.flow-rail{display:none!important}.postline-copy h2 span{color:#333}.thesis-points{background:white}}
