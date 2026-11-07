@@ -228,3 +228,13 @@ html.fx #projects-title.in b.lime{animation:letter-in 1s cubic-bezier(.16,1,.3,1
 .promo figcaption p{font-size:13px;line-height:1.8;color:var(--muted);margin-top:14px;max-width:300px}
 @media(max-width:760px){.promo{grid-template-columns:1fr;gap:20px;margin-top:45px}}
 @media print{.promo{display:none}}
+/* 3D desk card */
+.desk3d{display:grid;grid-template-columns:1.2fr 1fr;margin-top:40px;border:1px solid #425439;background:#0e150d;overflow:hidden;transition:border-color .3s}
+.desk3d:hover{border-color:#c3ef90}.desk3d:hover img{transform:scale(1.04)}
+.desk3d img{display:block;width:100%;height:100%;object-fit:cover;transition:transform .6s cubic-bezier(.16,1,.3,1)}
+.desk3d>div{padding:34px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.desk3d h3{font-size:30px;font-weight:400;letter-spacing:-.04em}
+.desk3d p{font-size:13px;line-height:1.8;color:var(--muted);max-width:340px}
+.desk3d b{font:11px var(--mono);color:#c5ed96;font-weight:400;margin-top:6px}
+@media(max-width:760px){.desk3d{grid-template-columns:1fr}.desk3d>div{padding:22px}}
+@media print{.desk3d{display:none}}
