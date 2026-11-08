@@ -1,0 +1,10 @@
+[
+  {
+    "date": "2026-11-08",
+    "slug": "ai-agents-rsa-1024",
+    "title": "AI agents just found 2 new cracks in RSA-1024",
+    "file": "2026-11-08-ai-agents-rsa-1024.pdf",
+    "topic_summary": "Google DeepMind (6 Nov 2026): human-guided AI agents found two weaknesses in legacy 1024-bit RSA - signature forgery (~1,600x theoretical gain) and batch factoring (~30x cheaper per extra key). RSA-2048+ unaffected.",
+    "sources": ["Google DeepMind announcement, 6 Nov 2026", "https://cryptobriefing.com/google-deepmind-ai-rsa-1024-bit-weaknesses/", "https://www.webpronews.com/deepmind-ai-agents-legacy-1024-bit-rsa-weaknesses"]
+  }
+]
