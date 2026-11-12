@@ -17,6 +17,26 @@ const circuitRoutes = [
   "M927 363 L859 363 L832 400 L768 400 L730 447 L666 447 L640 494 L595 494 L568 547 L552 688",
 ];
 
+const heartbeat = [
+  { offset: 0, strength: 0 },
+  { offset: 0.12, strength: 1 },
+  { offset: 0.24, strength: 0 },
+  { offset: 0.34, strength: 0.62 },
+  { offset: 0.46, strength: 0 },
+  { offset: 1, strength: 0 },
+];
+
+function beatStrength(progress) {
+  for (let i = 1; i < heartbeat.length; i++) {
+    const end = heartbeat[i];
+    if (progress > end.offset) continue;
+    const start = heartbeat[i - 1];
+    const fraction = (progress - start.offset) / (end.offset - start.offset);
+    return start.strength + (end.strength - start.strength) * fraction;
+  }
+  return 0;
+}
+
 export function PortfolioScene({ mainRef, signal, activeLayer }) {
   const hostRef = useRef(null);
   const fallbackRef = useRef(null);
@@ -40,6 +60,7 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
     let step = 0;
     let layer = 0;
     let pulseAnimation;
+    let heartbeatAnimation;
     let keyframes;
     let pose;
     let frameBounds;
@@ -104,8 +125,10 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
       }
       if (view && !motion.matches) {
         const viewportHeight = host.clientHeight;
+        const phase = heartbeatAnimation?.effect?.getComputedTiming().progress ?? 0;
         view.draw(time, pose, pulse, step, layer, {
           ...shot,
+          beat: beatStrength(phase),
           x: 2 * frameBounds.x / host.clientWidth - 1,
           y: 1 - 2 * (frameBounds.y - scroll) / viewportHeight,
           size: Math.min(frameBounds.width, frameBounds.height) / viewportHeight,
@@ -168,7 +191,16 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
     function onMediaChange() {
       if (motion.matches) releaseView();
       else void initialize();
-      if (motion.matches) pulseAnimation?.cancel();
+      if (motion.matches) {
+        pulseAnimation?.cancel();
+        heartbeatAnimation?.cancel();
+        heartbeatAnimation = undefined;
+      } else if (!heartbeatAnimation) {
+        heartbeatAnimation = main.animate(
+          heartbeat.map(({ offset, strength }) => ({ offset, "--reactor-beat": String(strength) })),
+          { duration: 1380, iterations: Infinity },
+        );
+      }
       onResize();
     }
 
@@ -213,6 +245,7 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
       motion.removeEventListener("change", onMediaChange);
 
       pulseAnimation?.cancel();
+      heartbeatAnimation?.cancel();
       releaseView();
       controls.current = null;
     };

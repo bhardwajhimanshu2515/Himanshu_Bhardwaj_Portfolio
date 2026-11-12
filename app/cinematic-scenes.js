@@ -233,12 +233,7 @@ function brainScene(group) {
     speed: 0.32 + random() * 0.66,
   }));
 
-  return (time, burst) => {
-    // A short second beat follows the first, with a longer rest between pairs.
-    const cycle = (time + 0.35) % 1.38;
-    const firstBeat = Math.exp(-Math.pow((cycle - 0.17) / 0.080, 2));
-    const secondBeat = Math.exp(-Math.pow((cycle - 0.46) / 0.092, 2));
-    const heartbeat = firstBeat + 0.52 * secondBeat;
+  return (time, burst, heartbeat) => {
     const thought = time * 0.18;
     rings.rotation.set(0.38, time * 0.19, 0.24 - time * 0.11);
     circuitry.rotation.set(0.09, -time * 0.14, -0.14);
@@ -269,7 +264,6 @@ function brainScene(group) {
       }
     });
     positions.needsUpdate = true;
-    return heartbeat;
   };
 }
 
@@ -367,7 +361,8 @@ export function createPortfolioScene(host) {
       pedestal.position.y -= 2.02;
       pedestal.scale.setScalar(1 - open * 0.6);
       pedestal.visible = open < 0.94;
-      const beat = reactor.visible ? updateReactor(time, pulse) : 0;
+      const beat = opening.beat ?? 0;
+      if (reactor.visible) updateReactor(time, pulse, beat);
       reactor.scale.setScalar((1 - open * 0.60) * (1 + beat * 0.038));
 
       signal.visible = pulse > 0.005;

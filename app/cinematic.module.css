@@ -1,3 +1,9 @@
+@property --reactor-beat {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 0;
+}
+
 .world {
   position: fixed;
   inset: 0 0 auto;
@@ -94,12 +100,14 @@
 
 @media screen and (prefers-reduced-motion: no-preference) {
   .fallback img,
+  .fallback::before,
   .electricity {
-    animation: sphere-heartbeat 1.38s ease-in-out infinite;
+    transform: scale(calc(1 + var(--reactor-beat, 0) * .035));
   }
 
   .heartbeat {
-    animation: core-heartbeat 1.38s ease-out infinite;
+    opacity: calc(.19 + var(--reactor-beat, 0) * .81);
+    transform: scale(calc(.88 + var(--reactor-beat, 0) * .23));
   }
 
   .electricity {
@@ -110,18 +118,21 @@
     animation: carry-signal calc(2.05s + var(--route-index) * .14s) linear infinite;
     animation-delay: calc(var(--route-index) * -.47s);
   }
-}
 
-@keyframes sphere-heartbeat {
-  0%, 26%, 46%, 100% { transform: scale(1); }
-  12% { transform: scale(1.035); }
-  34% { transform: scale(1.020); }
-}
+  :global(main:has(> [data-portfolio-scene]) h1),
+  :global(main:has(> [data-portfolio-scene]) h2),
+  :global(main:has(> [data-portfolio-scene]) h3) {
+    scale: calc(1 + var(--reactor-beat, 0) * var(--headline-pulse, .017));
+    transform-origin: left center;
+  }
 
-@keyframes core-heartbeat {
-  0%, 24%, 48%, 100% { opacity: .19; transform: scale(.88); }
-  12% { opacity: 1; transform: scale(1.11); }
-  34% { opacity: .68; transform: scale(1.02); }
+  :global(main:has(> [data-portfolio-scene]) h1) {
+    --headline-pulse: .028;
+  }
+
+  :global(main:has(> [data-portfolio-scene]) h3) {
+    --headline-pulse: .012;
+  }
 }
 
 @keyframes carry-signal {
@@ -157,13 +168,31 @@
   isolation: isolate;
 }
 
-:global(html[data-theme="light"]) .world img {
-  filter: none;
-}
-
 :global(html[data-theme="light"]) .world {
   filter: invert(1) hue-rotate(180deg);
   opacity: calc(.27 + var(--opening-blend, 1) * .70);
+  background: none;
+}
+
+:global(html[data-theme="light"]) .world::before {
+  display: none;
+}
+
+:global(html[data-theme="light"]) .world img {
+  visibility: hidden;
+}
+
+:global(html[data-theme="light"]) .fallback::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #a34d0c;
+  mask: url("/circuit-sphere-hd.webp") center / 100% 100% no-repeat luminance;
+}
+
+:global(html[data-theme="light"]) .heartbeat {
+  mix-blend-mode: multiply;
+  background: radial-gradient(ellipse at 49.3% 49.2%, #d76d1bbd, #df851f48 5%, transparent 18%);
 }
 
 .overview {
