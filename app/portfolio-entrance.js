@@ -43,9 +43,9 @@ export function PortfolioEntrance({ children }) {
     }
 
     function update(now) {
-      const delta = previous ? Math.min((now - previous) / 1000, 0.05) : 0;
+      const delta = previous ? (now - previous) / 1000 : 0;
       previous = now;
-      time += delta;
+      time += Math.min(delta, 0.05);
       progress += (target - progress) * (1 - Math.exp(-delta * 3.8));
       if (target === 1 && progress > 0.995) {
         finish();

@@ -26,6 +26,10 @@
   --entrance-peel: 0;
 }
 
+:global(html[data-theme="light"]) .entrance {
+  filter: invert(1) hue-rotate(180deg);
+}
+
 .entrance[data-dragging] {
   cursor: grabbing;
   user-select: none;
