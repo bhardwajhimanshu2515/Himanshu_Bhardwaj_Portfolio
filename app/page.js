@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 import { CinematicScene } from "./cinematic";
 import { useScrollChapters } from "./scroll-chapters";
 import cinematicStyles from "./cinematic.module.css";
+import heroStyles from "./reactor-hero.module.css";
 const email = "bhardwajhimanshu2515@gmail.com";
 const linkedin = "https://www.linkedin.com/in/mern-full-stack-developer";
 const github = "https://github.com/bhardwajhimanshu2515";
@@ -242,14 +243,21 @@ export default function Home() {
       <button className="menu-toggle" aria-expanded={menu} aria-controls="navigation" onClick={() => setMenu(!menu)}>{menu ? "Close" : "Menu"}</button>
     </header>
     <main ref={mainRef}>
-      <section id="overview" data-motion-chapter="overview" className={`hero wrap ${cinematicStyles.hero}`}>
-        <div className="workspace-path"><span><span aria-hidden="true">⌘</span> workspace</span><span>/</span><span>himanshu-bhardwaj</span><span>/</span><b>overview.tsx</b></div>
-        <div className="hero-intro"><span className="eyebrow"><i /> SENIOR PRODUCT ENGINEER / FULL STACK</span><span className="location">NOIDA, INDIA · UTC +05:30</span></div>
-        <div className="hero-grid">
-          <div className="hero-copy"><div className="hero-id"><p className="hello">HIMANSHU BHARDWAJ</p><span className="hero-status"><i /> Open to freelance projects</span></div><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
-          <EngineeringCore />
+      <section id="overview" data-motion-chapter="overview">
+        <div className={heroStyles.stage}>
+          <div className={heroStyles.art} data-hero-art aria-hidden="true">
+            <img src="/reactor-hero.webp" alt="" fetchPriority="high" width="1600" height="900" />
+          </div>
+          <div className="wrap">
+          <div className={`hero-copy ${heroStyles.copy}`}><div className="hero-id"><p className="hello">HIMANSHU BHARDWAJ</p><span className="hero-status"><i /> Open to freelance projects</span></div><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
+          </div>
         </div>
+        <div className={`wrap ${heroStyles.detail}`}>
+          <EngineeringCore />
+          <div>
         <div className="impact-strip">{[["5+","Years of engineering experience"],["20%","Lower application load time¹"],["30%","Higher development efficiency¹"],["25%","Fewer system crashes¹"]].map(([metric,label],index) => <div key={metric}><span className="metric-index">0{index + 1} / {["EXPERIENCE","PERFORMANCE","VELOCITY","RELIABILITY"][index]}</span><strong>{metric}</strong><span>{label}</span></div>)}</div><p className="metric-note">¹ Results from my work on American Water at Smart Energy Water.</p>
+          </div>
+        </div>
       </section>
       <Projects />
       <section data-motion-chapter="lab" className="project-lab wrap" aria-labelledby="lab-title">

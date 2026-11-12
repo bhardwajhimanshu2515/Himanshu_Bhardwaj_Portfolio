@@ -68,11 +68,12 @@
   opacity: calc(0.59 * (1 - var(--entrance-peel)));
 }
 
-:global(html[data-portfolio-entrance]) .content :global([data-hero-sphere])::after {
+:global(html[data-portfolio-entrance]) .content :global([data-hero-art])::after {
   content: "";
   position: absolute;
-  inset: 3% 5%;
-  background: radial-gradient(ellipse at center, #ffbd64bd 0%, #ff71266e 21%, transparent 57%);
+  inset: 0;
+  background: radial-gradient(ellipse at 73% 50%, #ffbd6499 0%, #ff71264e 13%, transparent 29%);
+  transform-origin: 73% 50%;
   pointer-events: none;
   animation: entrance-heartbeat 0.94s ease-out infinite;
 }
@@ -85,7 +86,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :global(html[data-portfolio-entrance]) .content :global([data-hero-sphere])::after {
+  :global(html[data-portfolio-entrance]) .content :global([data-hero-art])::after {
     animation: none;
   }
 }
@@ -119,6 +120,13 @@
 
 .controls button:hover {
   background: #503329;
+}
+
+@media (max-width: 760px) {
+  :global(html[data-portfolio-entrance]) .content :global([data-hero-art])::after {
+    background: radial-gradient(ellipse at 63% 47%, #ffbd6499 0%, #ff71264e 15%, transparent 34%);
+    transform-origin: 63% 47%;
+  }
 }
 
 @media (max-width: 460px) {
