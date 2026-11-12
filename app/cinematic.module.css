@@ -169,7 +169,6 @@
 }
 
 :global(html[data-theme="light"]) .world {
-  filter: invert(1) hue-rotate(180deg);
   opacity: calc(.27 + var(--opening-blend, 1) * .70);
   background: none;
 }

@@ -60,7 +60,7 @@ function Projects({ onSignal }) {
     <div className="projects-head"><span className="eyebrow">FEATURED PROJECT / 000</span><span className="projects-status"><i /> Submitted to the Claude Connectors Directory</span></div>
     <div className="postline-grid">
       <div className="postline-copy">
-        <h2 id="projects-title" aria-label="Postline">{"Postline".split("").map((ch,i)=><b key={i} aria-hidden="true" className={i>3?"lime":""} style={{"--i":i}}>{ch}</b>)}</h2>
+        <h2 id="projects-title" aria-label="Postline">{"Postline".split("").map((ch,i)=><b key={i} aria-hidden="true" className={i>3?"accent-letter":""} style={{"--i":i}}>{ch}</b>)}</h2>
         <p className="postline-lede">A Claude connector that writes, schedules, publishes, edits and deletes LinkedIn posts. Tell Claude “post this Monday at 9 am” and close the laptop. It goes live on time.</p>
         <div className="postline-facts">{facts.map(([n,l])=><div key={l}><strong>{n}</strong><span>{l}</span></div>)}</div>
         <div className="postline-stack">{["TypeScript","Model Context Protocol","OAuth 2.1","Cloudflare Workers","D1 + KV","Cron","LinkedIn API"].map(t=><span key={t}>{t}</span>)}</div>

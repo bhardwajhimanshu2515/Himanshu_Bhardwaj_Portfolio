@@ -17,7 +17,7 @@
     inset: auto 0 0;
     height: 1px;
     pointer-events: none;
-    background: linear-gradient(90deg, #60814655, #d6ff91);
+    background: linear-gradient(90deg, transparent, var(--accent));
     transform: scaleX(var(--chapter-progress, 1));
     transform-origin: left;
   }
