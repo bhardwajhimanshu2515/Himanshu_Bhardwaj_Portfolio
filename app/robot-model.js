@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { createRobotBeam } from "./robot-beam";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 
 function fabricTexture() {
@@ -77,6 +78,49 @@ function hoodShape(parent, fabric, trim) {
   addTube(parent, rim, .044, trim, true);
 }
 
+function buildTorchArm(root, cloth, seam, metal) {
+  const shoulder = new THREE.Group();
+  shoulder.position.set(-.40, 1.24, .13);
+  root.add(shoulder);
+  ellipsoid(shoulder, cloth, [0, -.18, 0], [.20, .26, .23]);
+
+  const elbow = new THREE.Group();
+  elbow.position.y = -.36;
+  shoulder.add(elbow);
+  ellipsoid(elbow, cloth, [0, -.10, .01], [.18, .23, .21]);
+  ellipsoid(elbow, seam, [0, -.23, .01], [.16, .10, .18]);
+
+  const grip = new THREE.Group();
+  grip.position.set(0, -.34, .08);
+  elbow.add(grip);
+  const palm = rounded(.23, .19, .20, .055, metal);
+  grip.add(palm);
+
+  const bezel = new THREE.MeshStandardMaterial({ color: 0xbb8553, metalness: .68, roughness: .30 });
+  const lensMaterial = new THREE.MeshStandardMaterial({ color: 0x58432a, emissive: 0xffb348, emissiveIntensity: 0, roughness: .32 });
+  const torch = new THREE.Group();
+  torch.position.z = .09;
+  grip.add(torch);
+
+  function barrel(top, bottom, length, y, material) {
+    const part = new THREE.Mesh(new THREE.CylinderGeometry(top, bottom, length, 20), material);
+    part.position.y = y;
+    torch.add(part);
+  }
+
+  barrel(.086, .092, .35, .01, metal);
+  barrel(.09, .135, .13, -.18, bezel);
+  barrel(.135, .135, .057, -.264, metal);
+  barrel(.116, .116, .014, -.298, lensMaterial);
+  const lens = new THREE.Object3D();
+  lens.position.y = -.307;
+  torch.add(lens);
+  const spill = new THREE.PointLight(0xffab4d, 0, 1.35, 2);
+  spill.position.set(0, -.33, .09);
+  torch.add(spill);
+  return { shoulder, elbow, torch, lens, lensMaterial, spill };
+}
+
 function hoodieBot() {
   const root = new THREE.Group();
   const bump = fabricTexture();
@@ -102,16 +146,18 @@ function hoodieBot() {
   ellipsoid(root, seam, [0,1.40,-.09], [.48,.15,.36]);
 
   for (const side of [-1,1]) {
-    const arm = ellipsoid(root, cloth, [side*.51,.94,.00], [.20,.47,.25]);
-    arm.rotation.z = side * .26;
-    const cuff = ellipsoid(root, seam, [side*.60,.59,.018], [.17,.14,.21]);
-    cuff.rotation.z = side * .22;
-    const palm = rounded(.21,.20,.18,.05,metal);
-    palm.position.set(side*.61,.48,.03);
-    root.add(palm);
-    for (let digit=0; digit<3; digit++) {
-      const x = side*.61 + (digit-1)*.053;
-      addTube(root, [[x,.45,.07],[x,.38,.09],[x,.35,.11]],.019,metal);
+    if (side === 1) {
+      const arm = ellipsoid(root, cloth, [.51,.94,0], [.20,.47,.25]);
+      arm.rotation.z = .26;
+      const cuff = ellipsoid(root, seam, [.60,.59,.018], [.17,.14,.21]);
+      cuff.rotation.z = .22;
+      const palm = rounded(.21,.20,.18,.05,metal);
+      palm.position.set(.61,.48,.03);
+      root.add(palm);
+      for (let digit = 0; digit < 3; digit++) {
+        const x = .61 + (digit - 1) * .053;
+        addTube(root, [[x,.45,.07],[x,.38,.09],[x,.35,.11]], .019, metal);
+      }
     }
     const leg = rounded(.35,.52,.41,.13,pants);
     leg.position.set(side*.22,.29,-.03);
@@ -122,6 +168,7 @@ function hoodieBot() {
     addTube(root, [[side*.10,1.39,.25],[side*.13,1.24,.33],[side*.16,.99,.34],[side*.18,.88,.34]],.018,cord);
   }
 
+  const torchArm = buildTorchArm(root, cloth, seam, metal);
   const head = new THREE.Group();
   head.position.set(0,1.92,0);
   root.add(head);
@@ -145,42 +192,97 @@ function hoodieBot() {
     eyes.add(light);
   }
   root.rotation.y = -.17;
-  return { root, head, eyes, bump };
+  return { root, head, eyes, bump, torchArm };
 }
 
-export function createRobotScene(host) {
+export function createRobotScene(figure, overlay) {
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setClearColor(0x000000, 0);
+  renderer.autoClear = false;
   const scene = new THREE.Scene();
-  const { root, head, eyes, bump } = hoodieBot();
+  const beam = createRobotBeam();
+  const { root, head, eyes, bump, torchArm } = hoodieBot();
+  const { shoulder, elbow, torch, lens, lensMaterial, spill } = torchArm;
   scene.add(root);
   const sky = new THREE.HemisphereLight(0xe5ebff, 0x493a32, 2.1);
   const key = new THREE.DirectionalLight(0xfff0e5, 2.1);
-  key.position.set(3,4,5);
+  key.position.set(3, 4, 5);
   const rim = new THREE.DirectionalLight(0xc4d4ff, 1.8);
-  rim.position.set(-3,2,-4);
-  scene.add(sky,key,rim);
-  const camera = new THREE.OrthographicCamera(-1,1,1.46,-1.46,.1,20);
-  camera.position.set(0,1.56,7);
-  camera.lookAt(0,1.40,0);
-  host.append(renderer.domElement);
+  rim.position.set(-3, 2, -4);
+  scene.add(sky, key, rim);
+
+  const camera = new THREE.OrthographicCamera(-1, 1, 1.46, -1.46, .1, 20);
+  camera.position.set(0, 1.56, 7);
+  camera.lookAt(0, 1.40, 0);
+  camera.updateMatrixWorld();
+  overlay.append(renderer.domElement);
+
+  const position = new THREE.Vector3();
+  const hand = new THREE.Vector2();
+  const muzzle = new THREE.Vector2();
+  const aim = new THREE.Vector3();
+  const down = new THREE.Vector3(0, -1, 0);
+  const cameraRight = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 0);
+  const cameraUp = new THREE.Vector3().setFromMatrixColumn(camera.matrixWorld, 1);
+  const parentRotation = new THREE.Quaternion();
+  const aimedRotation = new THREE.Quaternion();
+  let width = 1;
+  let height = 1;
 
   return {
     canvas: renderer.domElement,
     resize() {
-      const width = Math.max(host.clientWidth, 1), height = Math.max(host.clientHeight, 1);
-      camera.left = -1.46 * width / height;
+      width = overlay.clientWidth || 1;
+      height = overlay.clientHeight || 1;
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(3200000 / (width * height))));
+      renderer.setSize(width, height, false);
+    },
+    draw({ yaw, pitch, blink, lift, power, target, elapsed, settle }) {
+      const box = figure.getBoundingClientRect();
+      if (!box.height) return;
+      const viewportWidth = Math.round(box.width * 1.65);
+      const viewportHeight = Math.round(box.height);
+      const left = Math.round(box.left + (box.width - viewportWidth) * .5);
+      const top = Math.round(box.top);
+      camera.left = -1.46 * viewportWidth / viewportHeight;
       camera.right = -camera.left;
       camera.updateProjectionMatrix();
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
-      renderer.setSize(width,height,false);
-    },
-    draw(yaw,pitch,blink) {
-      head.rotation.set(pitch * .22, yaw * .36, -yaw * .10);
-      eyes.position.x = yaw * .10;
-      eyes.position.y = .10 - pitch * .07;
+
+      const targetY = target ? target.y - (box.top + box.height * .5) : 0;
+      const targetX = target ? target.x - (box.left + box.width * .5) : -width * .5;
+      const vertical = THREE.MathUtils.clamp(-targetY / (Math.abs(targetX) + Math.abs(targetY) + 1), -.5, 1);
+      root.rotation.y = -.17 + yaw * .12 - lift * .15;
+      root.position.y = lift * .05;
+      head.rotation.set(pitch * .22 - vertical * lift * .18, yaw * .36 - lift * .18, -yaw * .10 + lift * .04);
+      eyes.position.x = yaw * .10 - lift * .055;
+      eyes.position.y = .10 - pitch * .07 + vertical * lift * .048;
       eyes.scale.y = blink;
-      renderer.render(scene,camera);
+      shoulder.rotation.set(-.10 - lift * .20, 0, -.20 - lift * (.87 + vertical * .30));
+      elbow.rotation.set(-.16 - lift * .25, 0, -.12 - lift * (.36 + vertical * .27));
+      lensMaterial.emissiveIntensity = power * 2.6;
+      spill.intensity = power * .75;
+
+      function project(object, point) {
+        object.getWorldPosition(position).project(camera);
+        point.set(left + (position.x + 1) * viewportWidth / 2, top + (1 - position.y) * viewportHeight / 2);
+      }
+
+      torch.quaternion.identity();
+      if (target && lift > 0) {
+        project(torch, hand);
+        aim.copy(cameraRight).multiplyScalar(target.x - hand.x)
+          .addScaledVector(cameraUp, hand.y - target.y).normalize();
+        torch.parent.getWorldQuaternion(parentRotation).invert();
+        aimedRotation.setFromUnitVectors(down, aim.applyQuaternion(parentRotation));
+        torch.quaternion.slerp(aimedRotation, Math.max(lift, settle));
+      }
+
+      project(lens, muzzle);
+      renderer.setViewport(0, 0, width, height);
+      renderer.clear();
+      beam.render(renderer, width, height, muzzle, target, power, elapsed);
+      renderer.setViewport(left, height - top - viewportHeight, viewportWidth, viewportHeight);
+      renderer.render(scene, camera);
     },
     dispose() {
       const materials = new Set();
@@ -190,6 +292,7 @@ export function createRobotScene(host) {
       });
       for (const material of materials) material.dispose();
       bump.dispose();
+      beam.dispose();
       renderer.dispose();
       renderer.forceContextLoss();
       renderer.domElement.remove();

@@ -78,7 +78,7 @@ function Projects({ onSignal }) {
       <div className="promo-frame"><video controls playsInline preload="none" poster="/postline-promo-poster.jpg" aria-label="Postline promo video, 32 seconds, with music"><source src="/postline-promo.mp4" type="video/mp4" /></video></div>
       <figcaption><span className="eyebrow">WATCH / 32 SECONDS</span><p>Postline in half a minute: write in Claude, Postline holds it, it goes live on time. Every frame and every note was made in code.</p></figcaption>
     </figure>
-    <div className="thesis">
+    <div className="thesis" id="work-thesis">
       <div className="thesis-title"><span className="eyebrow">WHAT I BELIEVE</span><h2>AI is the same for everyone.<br /><em>Experience isn’t.</em></h2></div>
       <div className="thesis-points">
         {[["Context","AI raised the floor for everyone. Knowing the product, the users and the constraints is what raises the ceiling."],["The right questions","A wrong requirement gets you a beautifully tested wrong product. Deciding what “correct” means is still the engineer’s job."],["Judgment","In Postline, the tools were the easy part. OAuth, token lifetimes, retries that never double-post and LinkedIn’s rules were the real work. That part comes from experience."]].map(([t,c],i)=><article key={t}><span>0{i+1}</span><h3>{t}</h3><p>{c}</p></article>)}
@@ -176,7 +176,7 @@ function EngineeringMethod() {
     ["03", "Validation", "Verify the behavior.", "Automated component tests and hands-on debugging of production issues.", "Jest / Enzyme"],
     ["04", "Iteration", "Improve the outcome.", "Performance optimization, query improvements, and reusable foundations.", "Performance / Reuse"],
   ];
-  return <section data-motion-chapter="method" className={`method-section ${cinematicStyles.sceneSection}`}><div className="wrap">
+  return <section id="engineering-method" data-motion-chapter="method" className={`method-section ${cinematicStyles.sceneSection}`}><div className="wrap">
     <div className="method-heading"><div><span className="eyebrow">ENGINEERING METHOD / 003</span><h2>Think in systems.<br /><em>Deliver in details.</em></h2></div><p>Four connected parts of how I build and improve products.</p></div>
     <div className="method-pipeline">{stages.map(([number,label,title,copy,tech])=><article key={number}>
       <div className="method-terminal"><span>{number}</span><b>{label}</b><i aria-hidden="true">→</i></div>
