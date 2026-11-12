@@ -6,23 +6,26 @@
   align-items: center;
   min-height: clamp(530px, 82svh, 890px);
   color: #fff3e6;
-  background: #100c0a;
+  background: radial-gradient(ellipse at 74% 49%, #26190f 0%, #100c0a 56%);
 }
 
 .art {
   position: absolute;
-  inset: 0;
+  inset: 0 1% 0 43%;
   z-index: -2;
+  display: grid;
+  place-items: center;
   overflow: hidden;
   pointer-events: none;
 }
 
 .art img {
   display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  object-position: 65% center;
+  width: min(100%, 65svh, 740px);
+  height: auto;
+  max-height: 100%;
+  object-fit: contain;
+  mask-image: radial-gradient(ellipse closest-side at center, black 78%, #000e 88%, transparent 100%);
 }
 
 .stage::after {
@@ -32,7 +35,7 @@
   z-index: -1;
   pointer-events: none;
   background:
-    linear-gradient(90deg, #100c0af5 0%, #100c0ad9 24%, #100c0a50 48%, transparent 73%),
+    linear-gradient(90deg, #100c0a 0%, #100c0aee 27%, #100c0a33 49%, transparent 63%),
     linear-gradient(0deg, #100c0a 0%, transparent 19%);
 }
 
@@ -107,15 +110,15 @@
     position: absolute;
     inset: 0;
     z-index: 1;
-    background: radial-gradient(ellipse at 73% 40%, #ff962e63, transparent 18%);
+    background: radial-gradient(ellipse at center, #ffb64c51, transparent 28%);
     mix-blend-mode: screen;
     animation: reactor-pulse 4s ease-in-out infinite;
   }
 
   .art img {
     transform: translateY(calc(var(--chapter-progress, 0) * 4%))
-      scale(calc(1.11 - var(--chapter-progress, 0) * .11));
-    transform-origin: 72% 50%;
+      scale(calc(1.06 - var(--chapter-progress, 0) * .06));
+    transform-origin: center;
   }
 }
 
@@ -129,20 +132,16 @@
   .stage {
     align-items: end;
     min-height: auto;
-    padding-top: clamp(225px, 62vw, 410px);
+    padding-top: clamp(240px, 72vw, 440px);
   }
 
   .art {
-    bottom: auto;
-    height: clamp(300px, 79vw, 510px);
+    inset: 0 0 auto;
+    height: clamp(286px, 86vw, 510px);
   }
 
   .art img {
-    object-position: 84% 44%;
-  }
-
-  .art::before {
-    background: radial-gradient(ellipse at 67% 39%, #ff962e63, transparent 23%);
+    width: min(93%, 410px);
   }
 
   .stage::after {

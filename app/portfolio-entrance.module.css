@@ -72,8 +72,8 @@
   content: "";
   position: absolute;
   inset: 0;
-  background: radial-gradient(ellipse at 73% 50%, #ffbd6499 0%, #ff71264e 13%, transparent 29%);
-  transform-origin: 73% 50%;
+  background: radial-gradient(ellipse at center, #ffbd6499 0%, #ff71264e 13%, transparent 29%);
+  transform-origin: center;
   pointer-events: none;
   animation: entrance-heartbeat 0.94s ease-out infinite;
 }
@@ -120,13 +120,6 @@
 
 .controls button:hover {
   background: #503329;
-}
-
-@media (max-width: 760px) {
-  :global(html[data-portfolio-entrance]) .content :global([data-hero-art])::after {
-    background: radial-gradient(ellipse at 63% 47%, #ffbd6499 0%, #ff71264e 15%, transparent 34%);
-    transform-origin: 63% 47%;
-  }
 }
 
 @media (max-width: 460px) {

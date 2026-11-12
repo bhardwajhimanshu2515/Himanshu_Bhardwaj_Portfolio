@@ -246,7 +246,7 @@ export default function Home() {
       <section id="overview" data-motion-chapter="overview">
         <div className={heroStyles.stage}>
           <div className={heroStyles.art} data-hero-art aria-hidden="true">
-            <img src="/reactor-hero.webp" alt="" fetchPriority="high" width="1600" height="900" />
+            <img src="/circuit-sphere-hero.webp" alt="" fetchPriority="high" width="1100" height="1373" />
           </div>
           <div className="wrap">
           <div className={`hero-copy ${heroStyles.copy}`}><div className="hero-id"><p className="hello">HIMANSHU BHARDWAJ</p><span className="hero-status"><i /> Open to freelance projects</span></div><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
