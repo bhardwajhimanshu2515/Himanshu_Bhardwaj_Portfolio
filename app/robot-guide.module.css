@@ -12,8 +12,8 @@
 }
 
 .litHeadline {
-  text-shadow: 0 0 .36em color-mix(in srgb, #ffa235 var(--torch-glow, 0%), transparent),
-    0 0 .88em color-mix(in srgb, #f88818 calc(var(--torch-glow, 0%) * .38), transparent);
+  text-shadow: 0 0 .36em color-mix(in srgb, #ffa235 calc(var(--torch-glow, 0%) * .8), transparent),
+    0 0 .88em color-mix(in srgb, #f88818 calc(var(--torch-glow, 0%) * .30), transparent);
 }
 
 .guide {

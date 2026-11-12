@@ -66,7 +66,7 @@ export function createRobotBeam() {
       uniforms.origin.value.set(lens.x, lens.y);
       uniforms.target.value.set(target.x, target.y);
       uniforms.spotSize.value.set(target.radiusX, target.radiusY);
-      uniforms.strength.value = power;
+      uniforms.strength.value = power * .8;
       uniforms.time.value = elapsed;
       renderer.render(scene, camera);
     },

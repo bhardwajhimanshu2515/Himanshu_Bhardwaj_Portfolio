@@ -32,7 +32,7 @@ export function createFallbackBeam(figure, overlay) {
       context.translate(target.x, target.y);
       context.scale(target.radiusX, target.radiusY);
       const halo = context.createRadialGradient(0, 0, 0, 0, 0, 1);
-      halo.addColorStop(0, "rgba(255, 210, 135, .31)");
+      halo.addColorStop(0, "rgba(255, 210, 135, .25)");
       halo.addColorStop(1, "rgba(255, 172, 72, 0)");
       context.fillStyle = halo;
       context.fillRect(-1, -1, 2, 2);
@@ -43,8 +43,8 @@ export function createFallbackBeam(figure, overlay) {
       context.translate(wristX, wristY);
       context.rotate(angle);
       const light = context.createLinearGradient(reach, 0, Math.max(reach + 1, distance), 0);
-      light.addColorStop(0, "rgba(255, 230, 170, .72)");
-      light.addColorStop(.78, "rgba(255, 183, 88, .31)");
+      light.addColorStop(0, "rgba(255, 230, 170, .58)");
+      light.addColorStop(.78, "rgba(255, 183, 88, .25)");
       light.addColorStop(1, "rgba(255, 196, 110, 0)");
       context.fillStyle = light;
       context.beginPath();
