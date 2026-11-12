@@ -6,10 +6,10 @@ const siteUrl = "https://himanshubhardwaj.com";
 const title = "Himanshu Bhardwaj — Senior Product Engineer";
 const description = "Senior Product Engineer with 5+ years building full-stack products across utilities, healthcare, and HR technology. Creator of Postline, a Claude connector for LinkedIn.";
 const shareImage = {
-  url: "/portfolio-share-v1.jpg",
+  url: "/portfolio-share-v2.jpg",
   width: 1200,
   height: 630,
-  alt: "Himanshu Bhardwaj, Senior Product Engineer and creator of Postline",
+  alt: "Portfolio of Himanshu Bhardwaj, Senior Product Engineer, with an orange holographic sphere",
 };
 
 export const metadata = {
