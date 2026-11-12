@@ -37,19 +37,37 @@
 .brain {
   height: clamp(275px, 29vw, 400px);
   margin-block: 3px;
-  background: radial-gradient(ellipse at center, #24412a 0%, #102017 38%, transparent 75%);
+  background:
+    radial-gradient(ellipse at center, #f4752c25, transparent 62%),
+    repeating-linear-gradient(0deg, transparent 0 25px, #ff995e0b 26px 27px),
+    repeating-linear-gradient(90deg, transparent 0 25px, #ff995e0b 26px 27px),
+    #120c09;
+  mask-image: radial-gradient(ellipse at center, black 38%, transparent 76%);
+}
+
+:global(html[data-theme="light"]) .brain {
+  background:
+    radial-gradient(ellipse at center, #8c4b1a1a, transparent 62%),
+    repeating-linear-gradient(0deg, transparent 0 25px, #c9843920 26px 27px),
+    repeating-linear-gradient(90deg, transparent 0 25px, #c9843920 26px 27px);
+}
+
+:global(html[data-theme="light"]) .brain canvas {
+  /* The root light-theme filter turns these brighter traces into copper ink. */
+  filter: brightness(.82) saturate(1.25);
 }
 
 .brain:not([data-rendered])::before {
   content: "";
   position: absolute;
-  inset: 0;
-  background: url("/neural-brain.webp") center / contain no-repeat;
-  mask-image: radial-gradient(ellipse at center, black 46%, transparent 75%);
-}
-
-.brain:not([data-rendered]) canvas {
-  visibility: hidden;
+  inset: 50% auto auto 50%;
+  width: min(63%, 250px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid #f9732b80;
+  background: radial-gradient(circle, #ff8a4655 0%, #7c2e1c38 55%, transparent 75%);
+  box-shadow: 0 0 55px #ed64192e, inset 0 0 40px #ff8a4635;
 }
 
 .revealControls {
@@ -59,7 +77,7 @@
   justify-content: space-between;
   align-items: center;
   gap: 8px;
-  color: #b6c8b4;
+  color: #e2b998;
   font: 11px var(--mono);
 }
 
@@ -70,15 +88,15 @@
 .revealControls button {
   min-height: 44px;
   padding: 6px 12px;
-  color: #dbffad;
-  background: #15231c;
-  border: 1px solid #3a593c;
+  color: #ffd2a2;
+  background: #21150f;
+  border: 1px solid #61412c;
   border-radius: 4px;
   font: inherit;
 }
 
 .revealControls button:hover {
-  border-color: #a9e583;
+  border-color: #f3a86f;
 }
 
 @media (prefers-reduced-motion: reduce), print {

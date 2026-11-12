@@ -82,107 +82,100 @@ function orbitalRings(group, color, radius, count) {
   return rings;
 }
 
-function brainSurface(side, latitude, longitude) {
-  const belt = Math.cos(latitude);
-  const groove = Math.pow(0.5 + 0.5 * Math.sin(
-    longitude * 9 + latitude * 8 + 1.4 * Math.sin(latitude * 13 + longitude * 4),
-  ), 5);
-  const radius = 1 - groove * 0.11;
-  return new THREE.Vector3(
-    side * (0.58 + 0.56 * belt * Math.cos(longitude) * radius),
-    0.15 + 0.79 * Math.sin(latitude) * radius,
-    1.13 * belt * Math.sin(longitude) * radius,
-  );
-}
-
-function neuralHemisphere(side) {
-  const geometry = new THREE.SphereGeometry(1, 88, 56);
-  const position = geometry.attributes.position;
-  for (let i = 0; i < position.count; i++) {
-    const latitude = Math.asin(position.getY(i));
-    const longitude = Math.atan2(position.getZ(i), position.getX(i));
-    const point = brainSurface(side, latitude, longitude);
-    position.setXYZ(i, point.x, point.y, point.z);
+function circuitShell(group, random) {
+  const shell = new THREE.Group();
+  const copper = [];
+  const gold = [];
+  const junctions = [];
+  const routes = [];
+  for (const radius of [1.29, 1.56, 1.81]) {
+    for (let index = 0; index < 165; index++) {
+      const azimuth = random() * TAU;
+      const latitude = Math.asin(random() * 1.86 - 0.93);
+      const sweep = 0.12 + random() * 0.64;
+      const step = (random() - 0.5) * 0.37;
+      const segments = random() < 0.22 ? gold : copper;
+      const route = [];
+      for (let point = 0; point <= 22; point++) {
+        const progress = point / 22;
+        const angle = azimuth + sweep * (Math.min(progress, 0.48) + Math.max(progress - 0.64, 0));
+        const height = latitude + step * THREE.MathUtils.clamp((progress - 0.48) / 0.16, 0, 1);
+        const ring = radius * Math.cos(height);
+        route.push(new THREE.Vector3(ring * Math.cos(angle), radius * Math.sin(height), ring * Math.sin(angle)));
+        if (point > 0) segments.push(...route[point - 1], ...route[point]);
+        if (point % 11 === 0) junctions.push(...route[point]);
+      }
+      if (index % 5 === 0) routes.push(route);
+    }
   }
-  geometry.computeVertexNormals();
-  return geometry;
+  shell.add(lineSegments(copper, 0xfe781b, 0.28));
+  shell.add(lineSegments(gold, 0xffba49, 0.53));
+  shell.add(glowingPoints(junctions, 0xffa02d, 4.8, 0.65));
+  group.add(shell);
+  return { shell, routes };
 }
 
-function revealCloth(group) {
-  const material = new THREE.ShaderMaterial({
-    uniforms: { peel: { value: 0 }, clock: { value: 0 }, flash: { value: 0 } },
+function reactorCore(group, random) {
+  const core = orbitalRings(group, 0xffd067, 0.16, 7);
+  const amber = [];
+  const lights = [];
+  for (let index = 0; index < 120; index++) {
+    const angle = index * TAU / 120;
+    const radius = 0.23 + random() * 0.8;
+    const end = new THREE.Vector3(radius * Math.cos(angle), radius * Math.sin(angle), (random() - 0.5) * 0.48);
+    const inner = end.clone().multiplyScalar(0.19);
+    if (index % 3 === 0) amber.push(...inner, ...end);
+    lights.push(...end);
+  }
+  core.add(lineSegments(amber, 0xffac36, 0.47));
+  core.add(glowingPoints(lights, 0xffaa29, 7, 0.78));
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.7), new THREE.ShaderMaterial({
+    uniforms: { energy: { value: 0.7 } },
     vertexShader: `
-      uniform float peel;
-      uniform float clock;
-      varying vec2 fabric;
-      varying float fold;
+      varying vec2 coords;
       void main() {
-        fabric = uv;
-        float edge = smoothstep(0.1, 0.94, uv.x);
-        float lift = pow(peel, 1.15);
-        float ripple = sin(uv.y * 33.0 + uv.x * 16.0 - clock * 2.2);
-        vec3 drape = position;
-        drape.x = position.x * (1.0 - 0.62 * lift) + lift * 3.9;
-        drape.y = position.y + lift * (1.8 + edge * 0.4) + 0.19 * sin(uv.x * 8.0);
-        drape.z = 0.22 + 1.04 * sin(3.14159 * uv.x) * sin(3.14159 * uv.y);
-        fold = ripple * (0.12 + 0.39 * lift) + 0.20 * sin(uv.x * 39.0 - uv.y * 8.0);
-        drape.z += fold * (0.3 + 0.9 * lift);
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(drape, 1.0);
+        coords = uv * 2.0 - 1.0;
+        vec4 center = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+        vec2 scale = vec2(length(modelViewMatrix[0].xyz), length(modelViewMatrix[1].xyz));
+        gl_Position = projectionMatrix * (center + vec4(position.xy * scale, 0.0, 0.0));
       }
     `,
     fragmentShader: `
-      uniform float peel;
-      uniform float flash;
-      varying vec2 fabric;
-      varying float fold;
+      uniform float energy;
+      varying vec2 coords;
       void main() {
-        vec3 dx = dFdx(vec3(fabric, fold * 0.24));
-        vec3 dy = dFdy(vec3(fabric, fold * 0.24));
-        vec3 normal = normalize(cross(dx, dy));
-        float sheen = pow(max(0.0, dot(normal, normalize(vec3(-0.55, 0.45, 0.7)))), 4.0);
-        float seam = pow(max(0.0, cos(fabric.y * 54.0 + fabric.x * 28.0)), 14.0);
-        float glow = exp(-11.0 * length((fabric - vec2(0.5, 0.56)) * vec2(0.78, 1.0)));
-        vec3 color = vec3(0.012, 0.019, 0.017) + sheen * vec3(0.05, 0.085, 0.073);
-        color += seam * sheen * vec3(0.045, 0.066, 0.057);
-        color += glow * flash * vec3(0.20, 0.52, 0.10);
-        gl_FragColor = vec4(color, 1.0 - smoothstep(0.70, 0.98, peel));
+        float r = length(coords);
+        float glow = exp(-r * 7.0) * (1.0 - smoothstep(0.65, 1.0, r));
+        float flare = exp(-abs(coords.y) * 85.0 - abs(coords.x) * 4.5);
+        gl_FragColor = vec4(mix(vec3(1.0, 0.32, 0.018), vec3(1.0, 0.86, 0.44), exp(-r * 5.0)),
+          energy * (glow + 0.32 * flare));
         #include <colorspace_fragment>
       }
     `,
-    side: THREE.DoubleSide,
     transparent: true,
     depthWrite: false,
-    depthTest: false,
-  });
-  const cloth = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 2.65, 55, 42), material);
-  cloth.renderOrder = 5;
-  cloth.frustumCulled = false;
-  group.add(cloth);
-  return cloth;
+    blending: THREE.AdditiveBlending,
+  }));
+  group.add(glow);
+  return { core, glow };
 }
 
 function brainScene(group) {
   const random = randomSequence(4801);
   const neurons = [];
-  const surface = new THREE.MeshStandardMaterial({
-    color: 0x143b2a, emissive: 0x173d0f, emissiveIntensity: 0.37, roughness: 0.37,
-    metalness: 0.13, side: THREE.DoubleSide,
-  });
   for (const side of [-1, 1]) {
-    const material = side === -1 ? surface : surface.clone();
-    group.add(new THREE.Mesh(neuralHemisphere(side), material));
-    for (let i = 0; i < 225; i++) {
-      const latitude = Math.asin(1 - 2 * (i + 0.5) / 225);
-      const longitude = i * 2.399963 + random() * 0.16;
-      const point = brainSurface(side, latitude, longitude);
-      const center = new THREE.Vector3(side * 0.58, 0.15, 0);
-      neurons.push(point.addScaledVector(point.clone().sub(center).normalize(), 0.022));
+    for (let i = 0; i < 108; i++) {
+      const height = random() * 2 - 1;
+      const angle = random() * TAU;
+      const radius = Math.sqrt(1 - height * height) * (0.65 + random() * 0.35);
+      const folds = 1 + 0.10 * Math.sin(angle * 9 + height * 11);
+      neurons.push(new THREE.Vector3(
+        side * (0.63 + 0.59 * radius * Math.cos(angle) * folds),
+        height * 0.89 + 0.14,
+        radius * Math.sin(angle) * 1.12 * folds,
+      ));
     }
   }
-  const stem = new THREE.Mesh(new THREE.CapsuleGeometry(0.15, 0.29, 6, 14), surface.clone());
-  stem.position.set(0, -0.64, -0.26);
-  stem.rotation.x = -0.37;
-  group.add(stem);
   const connections = [];
   const strands = [];
   const edges = new Set();
@@ -205,16 +198,34 @@ function brainScene(group) {
       for (let i = 1; i < samples.length; i++) strands.push(...samples[i - 1], ...samples[i]);
     }
   });
-  group.add(lineSegments(strands, 0x9be95c, 0.31));
-  group.add(glowingPoints(neurons.flatMap(point => [...point]), 0xb4fa83, 5.2, 0.62));
-  const rings = orbitalRings(group, 0x72b572, 1.44, 3);
-  const sparks = glowingPoints(new Float32Array(90 * 5 * 3), 0xc1ff83, 8, 0.92, 5);
+  group.add(lineSegments(strands, 0xff7525, 0.18));
+  group.add(glowingPoints(neurons.flatMap(point => [...point]), 0xff7d2e, 5.5, 0.54));
+
+  const shell = [];
+  for (let i = 0; i < 420; i++) {
+    const y = 1 - (2 * i + 1) / 420;
+    const angle = i * 2.399963;
+    const r = Math.sqrt(1 - y * y);
+    shell.push(1.58 * r * Math.cos(angle), 1.58 * y, 1.58 * r * Math.sin(angle));
+  }
+  group.add(glowingPoints(shell, 0xff6d21, 3.4, 0.45));
+  const rings = orbitalRings(group, 0xffa338, 1.65, 5);
+  const { shell: circuitry, routes } = circuitShell(group, random);
+  const { core, glow } = reactorCore(group, random);
+  const current = glowingPoints(new Float32Array(routes.length * 3), 0xffc359, 8, 0.84);
+  current.frustumCulled = false;
+  circuitry.add(current);
+  const currentPositions = current.geometry.attributes.position;
+  currentPositions.setUsage(THREE.DynamicDrawUsage);
+  const activity = current.geometry.attributes.strength;
+  activity.setUsage(THREE.DynamicDrawUsage);
+  const sparks = glowingPoints(new Float32Array(68 * 5 * 3), 0xff9e43, 7.2, 0.92, 5);
   sparks.frustumCulled = false;
   group.add(sparks);
   const positions = sparks.geometry.attributes.position;
   positions.setUsage(THREE.DynamicDrawUsage);
   const point = new THREE.Vector3();
-  const paths = Array.from({ length: 90 }, () => ({
+  const paths = Array.from({ length: 68 }, () => ({
     curve: connections[Math.floor(random() * connections.length)],
     phase: random(),
     speed: 0.32 + random() * 0.66,
@@ -226,9 +237,28 @@ function brainScene(group) {
     const firstBeat = Math.exp(-Math.pow((cycle - 0.12) / 0.047, 2));
     const secondBeat = Math.exp(-Math.pow((cycle - 0.31) / 0.071, 2));
     const heartbeat = firstBeat + 0.52 * secondBeat;
+    const thought = time * 0.18;
     rings.rotation.set(0.38, time * 0.19, 0.24 - time * 0.11);
-    sparks.material.uniforms.opacity.value = 0.72 + heartbeat * 0.17 + burst * 0.22;
-    sparks.material.uniforms.size.value = 8 + burst * 3;
+    circuitry.rotation.set(0.09, -time * 0.14, -0.14);
+    circuitry.scale.setScalar(1 + 0.025 * heartbeat);
+    core.rotation.set(time * 0.42, time * 0.29, -time * 0.3);
+    core.scale.setScalar(1 + 0.11 * heartbeat);
+    glow.scale.setScalar(1 + 0.13 * heartbeat);
+    glow.material.uniforms.energy.value = 0.52 + 0.45 * heartbeat + burst * 0.28;
+    routes.forEach((route, index) => {
+      const phase = (time * (0.24 + index % 6 * 0.07) + index * 0.618) % 1;
+      const offset = phase * (route.length - 1);
+      const segment = Math.floor(offset);
+      point.copy(route[segment]).lerp(route[segment + 1], offset - segment);
+      currentPositions.setXYZ(index, point.x, point.y, point.z);
+      const longitude = Math.atan2(point.z, point.x) / TAU;
+      const cluster = Math.pow(Math.max(0, Math.cos(TAU * (longitude - thought) + point.y * 0.9)), 5);
+      activity.setX(index, Math.min(1, 0.32 + 0.58 * cluster + 0.17 * heartbeat + burst * 0.19));
+    });
+    currentPositions.needsUpdate = true;
+    activity.needsUpdate = true;
+    sparks.material.uniforms.opacity.value = 0.74 + burst * 0.26;
+    sparks.material.uniforms.size.value = 7.2 + burst * 3;
     paths.forEach(({ curve, phase, speed }, index) => {
       const progress = (phase + time * speed) % 1;
       for (let trail = 0; trail < 5; trail++) {
@@ -293,6 +323,84 @@ function ambientScene(group, variant) {
   };
 }
 
+function revealCloth(group) {
+  const material = new THREE.ShaderMaterial({
+    uniforms: { peel: { value: 0 }, clock: { value: 0 }, flash: { value: 0 } },
+    vertexShader: `
+      uniform float peel;
+      uniform float clock;
+      varying vec2 fabric;
+      varying vec3 clothNormal;
+      varying vec3 viewPosition;
+
+      vec3 drape(vec2 uv) {
+        vec2 centered = uv * 2.0 - 1.0;
+        float lift = pow(peel, 1.15);
+        float gathered = smoothstep(0.18, 0.94, uv.x);
+        float falling = smoothstep(0.1, 0.95, 1.0 - uv.y);
+        float folds = sin(uv.x * 30.0 + uv.y * 4.3)
+          + 0.37 * sin(uv.x * 56.0 - uv.y * 12.0);
+        float ripple = sin(uv.y * 17.0 - uv.x * 13.0 - clock * 2.4);
+        float bulge = max(0.0, cos(centered.x * 1.57) * cos(centered.y * 1.40));
+        return vec3(
+          centered.x * 2.24 * (1.0 - 0.54 * lift) + lift * 4.25
+            + 0.14 * centered.x * falling * folds,
+          centered.y * 2.04 + 0.25 * bulge - 0.24 * centered.x * centered.x
+            + lift * (1.48 + 0.68 * gathered + 0.18 * ripple),
+          0.30 + 1.47 * pow(bulge, 0.65)
+            + folds * (0.06 + 0.13 * falling) + ripple * (0.022 + lift * 0.31)
+        );
+      }
+
+      void main() {
+        fabric = uv;
+        vec3 point = drape(uv);
+        vec3 du = drape(uv + vec2(0.001, 0.0)) - drape(uv - vec2(0.001, 0.0));
+        vec3 dv = drape(uv + vec2(0.0, 0.001)) - drape(uv - vec2(0.0, 0.001));
+        clothNormal = normalize(normalMatrix * normalize(cross(du, dv)));
+        vec4 view = modelViewMatrix * vec4(point, 1.0);
+        viewPosition = view.xyz;
+        gl_Position = projectionMatrix * view;
+      }
+    `,
+    fragmentShader: `
+      uniform float peel;
+      uniform float flash;
+      varying vec2 fabric;
+      varying vec3 clothNormal;
+      varying vec3 viewPosition;
+
+      void main() {
+        vec3 normal = normalize(clothNormal) * (gl_FrontFacing ? 1.0 : -1.0);
+        vec3 view = normalize(-viewPosition);
+        vec3 key = normalize(vec3(-0.44, 0.72, 0.72));
+        float diffuse = max(0.0, dot(normal, key));
+        float satin = pow(max(0.0, dot(normal, normalize(key + view))), 18.0);
+        float rim = pow(1.0 - clamp(dot(normal, view), 0.0, 1.0), 2.6);
+        float hemDistance = min(min(fabric.x, 1.0 - fabric.x), min(fabric.y, 1.0 - fabric.y));
+        float hem = 1.0 - smoothstep(0.005, 0.017, hemDistance);
+        float glow = exp(-9.0 * length((fabric - vec2(0.5, 0.56)) * vec2(0.78, 1.0)));
+        vec3 color = vec3(0.012, 0.008, 0.006)
+          + diffuse * vec3(0.028, 0.020, 0.016)
+          + satin * vec3(0.20, 0.15, 0.12)
+          + (0.56 * rim + 0.44 * hem) * vec3(0.12, 0.059, 0.029);
+        color += glow * flash * vec3(0.55, 0.20, 0.045);
+        gl_FragColor = vec4(color, 1.0 - smoothstep(0.76, 0.98, peel));
+        #include <colorspace_fragment>
+      }
+    `,
+    side: THREE.DoubleSide,
+    transparent: true,
+    depthWrite: false,
+    depthTest: false,
+  });
+  const cloth = new THREE.Mesh(new THREE.PlaneGeometry(1, 1, 128, 104), material);
+  cloth.renderOrder = 5;
+  cloth.frustumCulled = false;
+  group.add(cloth);
+  return cloth;
+}
+
 export function createScene(host, variant) {
   const brain = variant === "brain";
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
@@ -304,16 +412,7 @@ export function createScene(host, variant) {
   const update = brain ? brainScene(group) : ambientScene(group, variant);
 
   const cloth = brain ? revealCloth(scene) : null;
-  if (brain) {
-    scene.add(new THREE.HemisphereLight(0xbbffd1, 0x163011, 2));
-    const key = new THREE.DirectionalLight(0xdcffa8, 3.1);
-    key.position.set(3, 4, 4);
-    scene.add(key);
-    const rim = new THREE.DirectionalLight(0x5be7ac, 2.1);
-    rim.position.set(-3, 1, -3);
-    scene.add(rim);
-  }
-  let framing = 1;
+  let restingDistance = 0;
   host.append(renderer.domElement);
 
   return {
@@ -321,26 +420,23 @@ export function createScene(host, variant) {
       const width = Math.max(host.clientWidth, 1);
       const height = Math.max(host.clientHeight, 1);
       camera.aspect = width / height;
-      framing = Math.max(1, 1 / camera.aspect);
-      camera.position.z = 6.1 * framing;
+      restingDistance = (brain ? 6.9 : 6.1) / Math.min(camera.aspect, 1);
+      camera.position.z = restingDistance;
       camera.updateProjectionMatrix();
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, brain ? 2 : 1.5));
       renderer.setSize(width, height, false);
     },
-    draw(time, pointer, burst, reveal) {
-      if (brain) {
-        const progress = THREE.MathUtils.smoothstep(reveal, 0, 1);
-        const pushIn = Math.sin(Math.PI * progress);
-        camera.position.set(0, pushIn * 0.25, (5.4 - pushIn * 0.82 + progress * 0.28) * framing);
-        camera.lookAt(0, 0.06, 0);
-        group.rotation.set(0.18 + pointer.y * 0.14, 0.45 + 1.02 * progress + Math.sin(time * 0.43) * 0.16 + pointer.x * 0.31, -0.10);
+    draw(time, pointer, burst, reveal = 1) {
+      const progress = brain ? THREE.MathUtils.smoothstep(reveal, 0, 1) : 1;
+      const pushIn = Math.sin(Math.PI * progress);
+      if (cloth) {
+        camera.position.z = restingDistance * (1 - 0.12 * pushIn);
         cloth.visible = progress < 0.98;
         cloth.material.uniforms.peel.value = progress;
         cloth.material.uniforms.clock.value = time;
         cloth.material.uniforms.flash.value = 0.33 + Math.pow(Math.max(0, Math.sin(time * 4)), 8) * 0.65;
-      } else {
-        group.rotation.set(0.16 + pointer.y * 0.16, time * 0.09 + pointer.x * 0.35, 0);
       }
+      group.rotation.set(0.16 + pointer.y * 0.16, time * (brain ? 0.29 : 0.09) + pointer.x * 0.35 + 0.42 * pushIn, 0);
       update(time, burst);
       renderer.render(scene, camera);
     },
