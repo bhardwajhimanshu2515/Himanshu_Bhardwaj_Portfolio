@@ -54,7 +54,7 @@
     translate: 0 calc(var(--chapter-arrival, 0) * 32px * var(--chapter-travel));
   }
 
-  [data-motion-chapter] :is(.postline-flow, .system-explorer, .stack-workbench, .connection-panel):focus-within {
+  [data-motion-chapter] :is(.postline-flow, .system-explorer, .stack-workbench, .connection-panel):has(:focus-visible) {
     translate: none;
     rotate: none;
     scale: none;

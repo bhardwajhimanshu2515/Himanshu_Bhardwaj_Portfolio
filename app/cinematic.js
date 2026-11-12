@@ -171,7 +171,7 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
 
   return <div ref={hostRef} className={styles.world} data-portfolio-scene aria-hidden="true">
     <div ref={fallbackRef} className={styles.fallback}>
-      <img src="/circuit-sphere-hero.webp" alt="" width="1100" height="1373" />
+      <img src="/circuit-sphere-hd.webp" alt="" width="1120" height="1400" />
     </div>
     <div className={styles.fallbackLayers}><i /><i /><i /></div>
   </div>;

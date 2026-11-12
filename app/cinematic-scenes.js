@@ -20,16 +20,18 @@ function glowingPoints(positions, color, size, opacity = 1, trailLength = 1) {
     uniforms: {
       tint: { value: new THREE.Color(color) },
       size: { value: size },
+      pixelRatio: { value: 1 },
       opacity: { value: opacity },
     },
     vertexShader: `
       uniform float size;
+      uniform float pixelRatio;
       attribute float strength;
       varying float glow;
       void main() {
         vec4 view = modelViewMatrix * vec4(position, 1.0);
         glow = strength;
-        gl_PointSize = size * (0.55 + strength * 0.45) * 7.0 / -view.z;
+        gl_PointSize = size * pixelRatio * (0.55 + strength * 0.45) * 7.0 / -view.z;
         gl_Position = projectionMatrix * view;
       }
     `,
@@ -331,7 +333,11 @@ export function createPortfolioScene(host) {
       const height = Math.max(1, host.clientHeight);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      const pixelRatio = Math.min(window.devicePixelRatio || 1, 2, Math.max(1, Math.sqrt(4500000 / (width * height))));
+      renderer.setPixelRatio(pixelRatio);
+      scene.traverse(object => {
+        if (object.isPoints) object.material.uniforms.pixelRatio.value = pixelRatio;
+      });
       renderer.setSize(width, height, false);
     },
     draw(time, pose, pulse, step, selectedLayer) {
