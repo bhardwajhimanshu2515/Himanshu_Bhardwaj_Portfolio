@@ -270,105 +270,106 @@ function brainScene(group) {
   };
 }
 
-const ambientPalettes = {
-  orbit: 0x9edbff,
-  field: 0x8be7bc,
-  stack: 0xb2c5ff,
-};
-
-function ambientScene(group, variant) {
-  const color = ambientPalettes[variant];
-  const random = randomSequence(106);
-  const dust = [];
-  for (let i = 0; i < 170; i++) {
-    dust.push((random() - 0.5) * 10, (random() - 0.5) * 4, (random() - 0.5) * 4);
-  }
-  group.add(glowingPoints(dust, color, 4.6, 0.57));
-
-  const form = new THREE.Group();
-  group.add(form);
-  if (variant === "orbit") {
-    orbitalRings(form, color, 1.15, 5);
-    const geometry = new THREE.IcosahedronGeometry(1.02, 1);
-    const wire = new THREE.WireframeGeometry(geometry);
-    geometry.dispose();
-    form.add(lineSegments(wire.attributes.position.array, color, 0.32));
-    wire.dispose();
-  } else if (variant === "field") {
-    const waves = [];
-    for (let row = 0; row < 19; row++) {
-      for (let i = 0; i < 72; i++) {
-        for (const column of [i, i + 1]) {
-          const x = (column - 36) * 0.11;
-          const z = (row - 9) * 0.13;
-          waves.push(x, 0.38 * Math.sin(x * 1.7 + z * 2) + 0.23 * Math.cos(x * 2.7 - z), z);
-        }
+function circuitLayers() {
+  const group = new THREE.Group();
+  const layers = Array.from({ length: 3 }, (_, index) => {
+    const layer = new THREE.Group();
+    layer.position.y = (1 - index) * 0.88;
+    const geometry = new THREE.BoxGeometry(2.7, 0.11, 1.74);
+    const surface = new THREE.MeshBasicMaterial({ color: 0x47240f, transparent: true, opacity: 0.62 });
+    layer.add(new THREE.Mesh(geometry, surface));
+    const outline = new THREE.LineBasicMaterial({ color: 0xfca456 });
+    layer.add(new THREE.LineSegments(new THREE.EdgesGeometry(geometry), outline));
+    const traces = [];
+    for (const side of [-1, 1]) {
+      for (let row = -3; row <= 3; row++) {
+        const z = row * 0.20;
+        traces.push(side * 0.14, 0.061, z * 0.35, side * 0.56, 0.061, z * 0.35);
+        traces.push(side * 0.56, 0.061, z * 0.35, side * 0.8, 0.061, z);
+        traces.push(side * 0.8, 0.061, z, side * 1.23, 0.061, z);
       }
     }
-    form.add(lineSegments(waves, color, 0.34));
-  } else {
-    const cube = new THREE.BoxGeometry(1.55, 1.55, 1.55);
-    const edges = new THREE.EdgesGeometry(cube);
-    for (let i = 0; i < 6; i++) {
-      const layer = lineSegments(edges.attributes.position.array, color, 0.38);
-      layer.scale.setScalar(0.48 + i * 0.16);
-      layer.rotation.y = i * 0.18;
-      form.add(layer);
-    }
-    cube.dispose();
-    edges.dispose();
-  }
-  return (time, burst, progress) => {
-    const entrance = progress ?? 1;
-    const arrival = 1 - THREE.MathUtils.smoothstep(entrance, 0, 1);
-    form.rotation.set(0.46 + Math.sin(time * 0.27) * 0.18, 0.32 + time * 0.18, -0.18);
-    if (variant === "field") {
-      form.rotation.x += arrival * 0.56;
-      form.rotation.z -= arrival * 0.23;
-      form.position.x = -arrival * 1.6;
-      form.scale.y = 1 + arrival * 0.8;
-    } else if (variant === "stack") {
-      const spread = Math.sin(Math.PI * entrance);
-      form.children.forEach((layer, index) => {
-        layer.position.y = (index - 2.5) * 0.39 * spread;
-        layer.rotation.y = index * (0.18 + spread * 0.22);
-      });
-    } else {
-      form.rotation.y -= arrival * 1.2;
-      form.position.z = -arrival * 1.1;
-    }
-  };
+    layer.add(lineSegments(traces, 0xff9c44, 0.67));
+    group.add(layer);
+    return { layer, surface, outline };
+  });
+  return { group, layers };
 }
 
-export function createScene(host, variant) {
-  const brain = variant === "brain";
+export function createPortfolioScene(host) {
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setClearColor(0x000000, 0);
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(39, 1, 0.1, 40);
-  const group = new THREE.Group();
-  scene.add(group);
-  const update = brain ? brainScene(group) : ambientScene(group, variant);
-
-  let restDistance = 0;
+  const camera = new THREE.PerspectiveCamera(40, 1, 0.1, 45);
+  const reactor = new THREE.Group();
+  scene.add(reactor);
+  const updateReactor = brainScene(reactor);
+  const pedestal = new THREE.Group();
+  for (const radius of [0.83, 1.16, 1.43]) {
+    const points = Array.from({ length: 96 }, (_, index) => {
+      const angle = index / 96 * TAU;
+      return new THREE.Vector3(radius * Math.cos(angle), 0, radius * Math.sin(angle));
+    });
+    const geometry = new THREE.BufferGeometry().setFromPoints(points);
+    pedestal.add(new THREE.LineLoop(geometry, new THREE.LineBasicMaterial({
+      color: 0xe3873e, opacity: 0.43, transparent: true,
+    })));
+  }
+  scene.add(pedestal);
+  const stack = circuitLayers();
+  scene.add(stack.group);
+  const signal = glowingPoints(new Float32Array(30 * 3), 0xffc276, 12, 1, 30);
+  signal.frustumCulled = false;
+  reactor.add(signal);
+  const signalPoints = signal.geometry.attributes.position;
+  signalPoints.setUsage(THREE.DynamicDrawUsage);
   host.append(renderer.domElement);
 
   return {
     resize() {
-      const width = Math.max(host.clientWidth, 1);
-      const height = Math.max(host.clientHeight, 1);
+      const width = Math.max(1, host.clientWidth);
+      const height = Math.max(1, host.clientHeight);
       camera.aspect = width / height;
-      restDistance = (brain ? 6.9 : 6.1) / Math.min(camera.aspect, 1);
-      camera.position.z = restDistance;
       camera.updateProjectionMatrix();
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       renderer.setSize(width, height, false);
     },
-    draw(time, pointer, burst, progress = null) {
-      const dolly = brain ? THREE.MathUtils.smoothstep(progress ?? 0, 0, 1) : 0;
-      camera.position.z = restDistance + dolly * 0.72;
-      group.rotation.set(0.16 + pointer.y * 0.16, time * (brain ? 0.29 : 0.09) + pointer.x * 0.35 + dolly * 0.54, 0);
-      update(time, burst, progress);
+    draw(time, pose, pulse, step, selectedLayer) {
+      const [angle, distance, elevation, offset, open] = pose;
+      const sin = Math.sin(angle);
+      const cos = Math.cos(angle);
+      camera.position.set(sin * distance, elevation, cos * distance);
+      camera.lookAt(0, 0, 0);
+      const shift = offset * distance * Math.tan(camera.fov * Math.PI / 360) * camera.aspect;
+      reactor.position.set(cos * shift, open * -1.9, -sin * shift);
+      reactor.scale.setScalar(1 - open * 0.60);
+      reactor.visible = open < 0.98;
+      reactor.rotation.y = time * 0.12;
+      pedestal.position.set(cos * shift, -2.02, -sin * shift);
+      pedestal.scale.setScalar(1 - open * 0.6);
+      pedestal.visible = open < 0.94;
+      if (reactor.visible) updateReactor(time, pulse);
+
+      signal.visible = pulse > 0.005;
+      if (signal.visible) {
+        signal.material.uniforms.opacity.value = pulse;
+        for (let i = 0; i < signalPoints.count; i++) {
+          const phase = step * TAU / 3 + (1 - pulse) * TAU - i * 0.045;
+          signalPoints.setXYZ(i, 1.86 * Math.cos(phase), 0.47 * Math.sin(phase * 2), 1.86 * Math.sin(phase));
+        }
+        signalPoints.needsUpdate = true;
+      }
+
+      stack.group.visible = open > 0.015;
+      stack.group.position.set(cos * shift, 0, -sin * shift);
+      stack.group.rotation.set(0.12, angle + time * 0.09, -0.10);
+      stack.group.scale.setScalar(open);
+      stack.layers.forEach(({ layer, surface, outline }, index) => {
+        const selected = selectedLayer === index || selectedLayer === 3;
+        layer.position.y = (1 - index) * (0.45 + open * 0.46) + (selected ? 0.1 : 0);
+        surface.color.setHex(selected ? 0xab5b21 : 0x47240f);
+        outline.color.setHex(selected ? 0xffd395 : 0xc77b3f);
+      });
       renderer.render(scene, camera);
     },
     dispose() {
@@ -376,8 +377,8 @@ export function createScene(host, variant) {
         object.geometry?.dispose();
         object.material?.dispose();
       });
-      renderer.forceContextLoss();
       renderer.dispose();
+      renderer.forceContextLoss();
       renderer.domElement.remove();
     },
     canvas: renderer.domElement,

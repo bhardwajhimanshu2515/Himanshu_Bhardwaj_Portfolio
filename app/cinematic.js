@@ -1,157 +1,178 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import { journeyPose, measureJourney } from "./portfolio-journey";
 import styles from "./cinematic.module.css";
 
-export function CinematicScene({ variant, className, burstSignal = 0 }) {
+export function PortfolioScene({ mainRef, signal, activeLayer }) {
   const hostRef = useRef(null);
+  const fallbackRef = useRef(null);
   const controls = useRef(null);
 
   useEffect(() => {
     const host = hostRef.current;
+    const main = mainRef.current;
+    const fallback = fallbackRef.current;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const chapter = host.closest("[data-motion-chapter]");
-    const pointer = { x: 0, y: 0 };
-    const target = { x: 0, y: 0 };
+    const narrow = window.matchMedia("(max-width: 760px)");
     let view;
     let loading = false;
+    let failed = false;
     let disposed = false;
-    let visible = false;
-    let contextLost = false;
     let frame = 0;
     let previous = 0;
     let time = 0;
-    let burst = 0;
+    let pulse = 0;
+    let step = 0;
+    let layer = 0;
+    let pulseAnimation;
+    let keyframes;
+    let pose;
+    let needsMeasurement = true;
+    let needsPose = true;
 
-    function draw() {
-      const progress = motion.matches ? null : chapter?.style.getPropertyValue("--chapter-progress");
-      view.draw(time, pointer, burst, progress ? Number(progress) : null);
+    function schedule() {
+      if (!frame && !document.hidden && !disposed) frame = requestAnimationFrame(render);
     }
 
     function render(now) {
       frame = 0;
       const delta = previous ? Math.min((now - previous) / 1000, 0.05) : 0;
       previous = now;
-      time += delta * (1 + burst * 3);
-      burst = Math.max(0, burst - delta * 0.54);
-      pointer.x += (target.x - pointer.x) * 0.065;
-      pointer.y += (target.y - pointer.y) * 0.065;
-      draw();
-      start();
-    }
+      time += delta;
+      pulse = Math.max(0, pulse - delta * 0.52);
 
-    function start() {
-      if (view && visible && !contextLost && !motion.matches && !document.hidden && !frame) {
-        frame = requestAnimationFrame(render);
+      if (needsMeasurement) {
+        const height = window.innerHeight;
+        const maxScroll = document.documentElement.scrollHeight - height;
+        keyframes = measureJourney(main, height, maxScroll, window.scrollY);
+        view?.resize();
+        needsMeasurement = false;
+      }
+      if (needsPose) {
+        pose = journeyPose(keyframes, motion.matches ? 0 : window.scrollY);
+        host.style.setProperty("--world-offset", `${pose[3] * 36}vw`);
+        host.style.setProperty("--world-scale", 7.2 / pose[1]);
+        host.style.setProperty("--world-turn", `${pose[0] * 9}deg`);
+        host.style.setProperty("--world-layer-blend", pose[4]);
+        needsPose = false;
+      }
+      if (view && !motion.matches && !narrow.matches) {
+        view.draw(time, pose, pulse, step, layer);
+        schedule();
+      } else {
+        previous = 0;
       }
     }
 
-    function stop() {
-      cancelAnimationFrame(frame);
-      frame = 0;
+    function onScroll() {
+      needsPose = true;
+      schedule();
+    }
+
+    function onResize() {
+      needsMeasurement = true;
+      onScroll();
+    }
+
+    function onVisibility() {
       previous = 0;
+      schedule();
     }
 
-    function sync() {
-      stop();
-      start();
-    }
-
-    function onMotionChange() {
-      if (view && !contextLost) draw();
-      sync();
-    }
-
-    function resize() {
-      if (!view || contextLost) return;
-      view.resize();
-      draw();
+    function releaseView() {
+      if (!view) return;
+      view.canvas.removeEventListener("webglcontextlost", onContextLost);
+      view.dispose();
+      view = undefined;
+      delete host.dataset.rendered;
     }
 
     function onContextLost(event) {
       event.preventDefault();
-      contextLost = true;
-      stop();
-      delete host.dataset.rendered;
-    }
-
-    function onContextRestored() {
-      contextLost = false;
-      resize();
-      host.dataset.rendered = "true";
-      start();
+      failed = true;
+      releaseView();
     }
 
     async function initialize() {
-      if (loading) return;
+      if (view || loading || failed || motion.matches || narrow.matches) return;
       loading = true;
       try {
-        const { createScene } = await import("./cinematic-scenes");
-        if (disposed) return;
-        view = createScene(host, variant);
+        const { createPortfolioScene } = await import("./cinematic-scenes");
+        if (disposed || motion.matches || narrow.matches) return;
+        view = createPortfolioScene(host);
         view.canvas.addEventListener("webglcontextlost", onContextLost);
-        view.canvas.addEventListener("webglcontextrestored", onContextRestored);
-        resize();
         host.dataset.rendered = "true";
-        start();
+        onResize();
       } catch {
-        // Keep the CSS fallback when WebGL is unavailable.
+        failed = true;
+        releaseView();
+      } finally {
+        loading = false;
       }
     }
 
-    const intersection = new IntersectionObserver(([entry]) => {
-      visible = entry.isIntersecting;
-      if (visible) void initialize();
-      sync();
-    });
-    intersection.observe(host);
-    const dimensions = new ResizeObserver(resize);
-    dimensions.observe(host);
-
-    function move(event) {
-      if (event.pointerType === "touch") return;
-      const rect = host.getBoundingClientRect();
-      target.x = (event.clientX - rect.left) / rect.width * 2 - 1;
-      target.y = (event.clientY - rect.top) / rect.height * 2 - 1;
-    }
-
-    function resetPointer() {
-      target.x = 0;
-      target.y = 0;
+    function onMediaChange() {
+      if (motion.matches || narrow.matches) releaseView();
+      else void initialize();
+      if (motion.matches) pulseAnimation?.cancel();
+      onResize();
     }
 
     controls.current = {
-      pulse() {
-        if (!motion.matches) burst = 1;
+      pulse(nextStep) {
+        if (motion.matches) return;
+        step = nextStep;
+        pulse = 1;
+        if (!view) {
+          pulseAnimation?.cancel();
+          pulseAnimation = fallback.animate([{ filter: "brightness(1)" }, { filter: "brightness(1.7)" }, { filter: "brightness(1)" }], 880);
+        }
+        schedule();
+      },
+      select(nextLayer) {
+        layer = nextLayer;
+        host.dataset.layer = String(nextLayer);
+        schedule();
       },
     };
-    motion.addEventListener("change", onMotionChange);
-    document.addEventListener("visibilitychange", sync);
-    host.addEventListener("pointermove", move);
-    host.addEventListener("pointerleave", resetPointer);
+
+    const dimensions = new ResizeObserver(onResize);
+    dimensions.observe(main);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", onResize);
+    document.addEventListener("visibilitychange", onVisibility);
+    motion.addEventListener("change", onMediaChange);
+    narrow.addEventListener("change", onMediaChange);
+    onMediaChange();
 
     return () => {
       disposed = true;
-      stop();
-      intersection.disconnect();
+      cancelAnimationFrame(frame);
       dimensions.disconnect();
-      motion.removeEventListener("change", onMotionChange);
-      document.removeEventListener("visibilitychange", sync);
-      host.removeEventListener("pointermove", move);
-      host.removeEventListener("pointerleave", resetPointer);
-      if (view) {
-        view.canvas.removeEventListener("webglcontextlost", onContextLost);
-        view.canvas.removeEventListener("webglcontextrestored", onContextRestored);
-        view.dispose();
-      }
-      delete host.dataset.rendered;
+      window.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", onResize);
+      document.removeEventListener("visibilitychange", onVisibility);
+      motion.removeEventListener("change", onMediaChange);
+      narrow.removeEventListener("change", onMediaChange);
+      pulseAnimation?.cancel();
+      releaseView();
       controls.current = null;
     };
-  }, [variant]);
+  }, [mainRef]);
 
   useEffect(() => {
-    if (burstSignal) controls.current?.pulse();
-  }, [burstSignal]);
+    if (signal) controls.current?.pulse(signal.step);
+  }, [signal]);
 
-  return <div ref={hostRef} data-hero-sphere={variant === "brain" ? "" : undefined} className={[styles.scene, styles[variant], className].filter(Boolean).join(" ")} aria-hidden="true" />;
+  useEffect(() => {
+    controls.current?.select(activeLayer);
+  }, [activeLayer]);
+
+  return <div ref={hostRef} className={styles.world} data-portfolio-scene aria-hidden="true">
+    <div ref={fallbackRef} className={styles.fallback}>
+      <img src="/circuit-sphere-hero.webp" alt="" width="1100" height="1373" />
+    </div>
+    <div className={styles.fallbackLayers}><i /><i /><i /></div>
+  </div>;
 }

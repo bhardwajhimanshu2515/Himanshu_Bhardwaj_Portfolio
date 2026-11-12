@@ -1,16 +1,15 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
-import { CinematicScene } from "./cinematic";
+import { PortfolioScene } from "./cinematic";
 import { useScrollChapters } from "./scroll-chapters";
 import cinematicStyles from "./cinematic.module.css";
-import heroStyles from "./reactor-hero.module.css";
 const email = "bhardwajhimanshu2515@gmail.com";
 const linkedin = "https://www.linkedin.com/in/mern-full-stack-developer";
 const github = "https://github.com/bhardwajhimanshu2515";
 const medium = "https://medium.com/@bhardwajhimanshu2515";
 const postlineRepo = "https://github.com/bhardwajhimanshu2515/postline";
 const fxTargets = [
-  [".hero-copy > *", "up"], [".engineering-core", "zoom"], [".impact-strip > div", "flip"],
+  [".impact-strip > div", "flip"],
   [".projects-head", "up"], [".postline-copy > :not(h2)", "up"], [".promo-frame", "zoom"], [".promo figcaption", "up"], ["#projects-title", "zoom"], [".postline-flow", "right"],
   [".thesis-title", "left"], [".thesis-points article", "flip"],
   [".lab-introduction > *", "left"], [".system-explorer", "right"],
@@ -49,7 +48,7 @@ function useFx3D() {
     return () => { io.disconnect(); root.classList.remove("fx"); tiltables.forEach(el => { el.removeEventListener("mousemove", move); el.removeEventListener("mouseleave", leave); }); };
   }, []);
 }
-function Projects() {
+function Projects({ onSignal }) {
   const [step, setStep] = useState(0);
   const flow = [
     ["01", "You write", "Claude", "Draft the post with Claude, then say when it should go out: now, or Monday at 9 am."],
@@ -58,7 +57,6 @@ function Projects() {
   ];
   const facts = [["7", "tools for Claude"], ["2", "OAuth flows"], ["36", "end-to-end checks"], ["8", "post types"]];
   return <section id="projects" data-motion-chapter="projects" className={`projects wrap ${cinematicStyles.sceneSection}`} aria-labelledby="projects-title">
-    <CinematicScene variant="field" className={cinematicStyles.sectionBackdrop} />
     <div className="projects-head"><span className="eyebrow">FEATURED PROJECT / 000</span><span className="projects-status"><i /> Submitted to the Claude Connectors Directory</span></div>
     <div className="postline-grid">
       <div className="postline-copy">
@@ -70,7 +68,7 @@ function Projects() {
       </div>
       <div className="postline-flow">
         <div className="instrument-label"><span>HOW IT WORKS</span><span>CLAUDE → POSTLINE → LINKEDIN</span></div>
-        <div className="flow-rail" aria-label="Postline steps">{flow.map(([n,t],i)=><button key={n} aria-pressed={step===i} onClick={()=>setStep(i)}><span>{n}</span>{t}</button>)}</div>
+        <div className="flow-rail" aria-label="Postline steps">{flow.map(([n,t],i)=><button key={n} aria-pressed={step===i} onClick={()=>{ setStep(i); onSignal(i); }}><span>{n}</span>{t}</button>)}</div>
         <div className="flow-readout" key={step} aria-live="polite"><span className="layer-label">{flow[step][2]}</span><h3>{flow[step][1]}</h3><p>{flow[step][3]}</p></div>
         <div className="flow-foot"><span>Supports text, articles, images, PDF carousels, video, multi-image, polls and reshares</span></div>
       </div>
@@ -106,21 +104,6 @@ const systems = [
   { name: "Claimocity", domain: "Healthcare technology", layers: [["CLIENTS", "Ionic React", "Web · iOS · Android"], ["SERVICES", "Node.js / REST", "Healthcare billing APIs"], ["DATA", "MongoDB", "Query optimization"]], result: "20%", label: "reduction in API response time", detail: "Built cross-platform experiences and optimized database queries within a 10-member engineering team.", metrics: [["3", "platforms: web, iOS, Android"], ["10", "team members"]] },
   { name: "Emplify", domain: "HR technology", layers: [["INTERFACE", "React + Redux Toolkit", "HRMS user experience"], ["API", "GraphQL / AWS AppSync", "Application APIs"], ["INTEGRATIONS", "Gusto + Slack", "Connected third-party services"]], result: "15%", label: "improvement in engagement", detail: "Led UI development, built GraphQL APIs, and developed a Slack application to support employee engagement.", metrics: [["GraphQL", "application API layer"], ["Slack", "engagement integration"]] },
 ];
-function EngineeringCore() {
-  const [layer, setLayer] = useState(0);
-  const [signal, setSignal] = useState(0);
-  const layers = [
-    ["01", "Interface", "React / TypeScript", "Reusable interfaces. Predictable state. Cross-platform experiences."],
-    ["02", "Services", "Node.js / .NET / GraphQL", "API integration that connects product experiences to backend systems."],
-    ["03", "Data", "MongoDB / SQL", "Database interactions and query optimization built around application needs."],
-  ];
-  return <div className="engineering-core">
-    <div className="core-caption"><span>ENGINEERING AT EVERY LAYER</span><span>FIG. 001</span></div>
-    <CinematicScene variant="brain" burstSignal={signal} />
-    <div className="core-controls" aria-label="Explore the engineering layers">{layers.map(([number,name],index)=><button key={name} aria-pressed={layer===index} onClick={() => { setLayer(index); setSignal(value => value + 1); }}><span>{number}</span>{name}</button>)}</div>
-    <div className="core-readout" aria-live="polite"><span>{layers[layer][2]}</span><p>{layers[layer][3]}</p></div>
-  </div>;
-}
 function SystemExplorer() {
   const [selected, setSelected] = useState(0);
   const [view, setView] = useState("system");
@@ -164,7 +147,7 @@ function CommandPalette() {
     </dialog>
   </>;
 }
-function StackWorkbench() {
+function StackWorkbench({ onLayer }) {
   const [selected, setSelected] = useState(0);
   const contexts = [
     ["American Water / Claimocity / Emplify", "Reusable enterprise interfaces, cross-platform applications, and predictable state management.", "UI components → application state → user experience"],
@@ -174,7 +157,7 @@ function StackWorkbench() {
   ];
   return <div className="stack-workbench">
     <div className="instrument-label"><span>CAPABILITY MAP</span><span>04 DOMAINS</span></div>
-    <div className="stack-selector" aria-label="Select an engineering discipline">{expertise.map(([title],index)=><button key={title} aria-pressed={selected===index} onClick={()=>setSelected(index)}><span>0{index+1}</span>{title}<b aria-hidden="true">↗</b></button>)}</div>
+    <div className="stack-selector" aria-label="Select an engineering discipline">{expertise.map(([title],index)=><button key={title} aria-pressed={selected===index} onClick={()=>{ setSelected(index); onLayer(index); }}><span>0{index+1}</span>{title}<b aria-hidden="true">↗</b></button>)}</div>
     <div className="stack-inspector" key={selected}>
       <div className="stack-heading"><span className="stack-symbol" aria-hidden="true">{["⌘","↔","▱","✓"][selected]}</span><div><span className="eyebrow">DISCIPLINE / 0{selected+1}</span><h3>{expertise[selected][0]}</h3></div></div>
       <div className="stack-chips">{expertise[selected][1].split(", ").map(skill=><span key={skill}>{skill}</span>)}</div>
@@ -192,7 +175,7 @@ function EngineeringMethod() {
     ["03", "Validation", "Verify the behavior.", "Automated component tests and hands-on debugging of production issues.", "Jest / Enzyme"],
     ["04", "Iteration", "Improve the outcome.", "Performance optimization, query improvements, and reusable foundations.", "Performance / Reuse"],
   ];
-  return <section data-motion-chapter="method" className={`method-section ${cinematicStyles.sceneSection}`}><CinematicScene variant="stack" className={cinematicStyles.sectionBackdrop} /><div className="wrap">
+  return <section data-motion-chapter="method" className={`method-section ${cinematicStyles.sceneSection}`}><div className="wrap">
     <div className="method-heading"><div><span className="eyebrow">ENGINEERING METHOD / 003</span><h2>Think in systems.<br /><em>Deliver in details.</em></h2></div><p>Four connected parts of how I build and improve products.</p></div>
     <div className="method-pipeline">{stages.map(([number,label,title,copy,tech])=><article key={number}>
       <div className="method-terminal"><span>{number}</span><b>{label}</b><i aria-hidden="true">→</i></div>
@@ -230,6 +213,8 @@ function ThemeToggle() {
 export default function Home() {
   const [menu, setMenu] = useState(false);
   const mainRef = useRef(null);
+  const [signal, setSignal] = useState(null);
+  const [activeLayer, setActiveLayer] = useState(0);
   useFx3D();
   useScrollChapters(mainRef);
   return <>
@@ -243,23 +228,18 @@ export default function Home() {
       <button className="menu-toggle" aria-expanded={menu} aria-controls="navigation" onClick={() => setMenu(!menu)}>{menu ? "Close" : "Menu"}</button>
     </header>
     <main ref={mainRef}>
-      <section id="overview" data-motion-chapter="overview">
-        <div className={heroStyles.stage}>
-          <div className={heroStyles.art} data-hero-art aria-hidden="true">
-            <img src="/circuit-sphere-hero.webp" alt="" fetchPriority="high" width="1100" height="1373" />
-          </div>
-          <div className="wrap">
-          <div className={`hero-copy ${heroStyles.copy}`}><div className="hero-id"><p className="hello">HIMANSHU BHARDWAJ</p><span className="hero-status"><i /> Open to freelance projects</span></div><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
-          </div>
+      <PortfolioScene mainRef={mainRef} signal={signal} activeLayer={activeLayer} />
+      <section id="overview" className={`wrap ${cinematicStyles.overview}`} data-motion-chapter="overview">
+        <h1>Himanshu Bhardwaj</h1>
+        <p className={cinematicStyles.role}>Senior Product Engineer at Smart Energy Water</p>
+        <p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p>
+        <div className="actions">
+          <a className="button" href="#projects">Explore projects <span aria-hidden="true">↓</span></a>
+          <a className="text-link" href="#experience">View experience <span aria-hidden="true">↗</span></a>
         </div>
-        <div className={`wrap ${heroStyles.detail}`}>
-          <EngineeringCore />
-          <div>
         <div className="impact-strip">{[["5+","Years of engineering experience"],["20%","Lower application load time¹"],["30%","Higher development efficiency¹"],["25%","Fewer system crashes¹"]].map(([metric,label],index) => <div key={metric}><span className="metric-index">0{index + 1} / {["EXPERIENCE","PERFORMANCE","VELOCITY","RELIABILITY"][index]}</span><strong>{metric}</strong><span>{label}</span></div>)}</div><p className="metric-note">¹ Results from my work on American Water at Smart Energy Water.</p>
-          </div>
-        </div>
       </section>
-      <Projects />
+      <Projects onSignal={step => setSignal({ step })} />
       <section data-motion-chapter="lab" className="project-lab wrap" aria-labelledby="lab-title">
         <div className="lab-introduction"><span className="eyebrow">INSIDE THE WORK / 001</span><h2 id="lab-title">Systems thinking.<br /><em>Production proof.</em></h2><p>Explore the technologies and outcomes behind three products I helped build.</p><div className="lab-index"><span>01—03</span><p>UTILITIES<br />HEALTHCARE<br />HR TECHNOLOGY</p></div><a href="#experience" className="text-link">Read the engineering history ↗</a></div>
         <SystemExplorer />
@@ -269,8 +249,8 @@ export default function Home() {
         <div className="career-log"><div className="instrument-label"><span>EXPERIENCE LOG</span><span>NEWEST FIRST</span></div>{roles.map(([date,title,company,product,text,tags], index) => <article className="role" key={date}><div className="role-meta"><span className="role-id">0{roles.length-index}</span><span>{date}</span>{index === 0 && <span className="current">Current role</span>}</div><h3>{title}</h3><p className="company">{company}</p>{product && <span className="product"><span aria-hidden="true">▱ </span> {product}</span>}<p className="role-description">{text}</p><div className="tags">{tags.map(tag => <span key={tag}>{tag}</span>)}</div></article>)}</div>
       </section>
       <EngineeringMethod />
-      <section id="expertise" data-motion-chapter="expertise" className="section wrap two-column"><div className="section-aside"><span className="eyebrow">TECHNICAL EXPERTISE / 004</span><h2>Depth across<br />the <em>stack.</em></h2><p>Select a discipline to explore its tools and where I’ve applied them.</p><div className="discipline-map" aria-hidden="true"><span>UI</span><i /><span>API</span><i /><span>DB</span></div></div><div><StackWorkbench /><div className="education"><div className="education-mark" aria-hidden="true">B.TECH<br /><span>CS / 2021</span></div><div><span className="eyebrow">FOUNDATION / EDUCATION</span><h3>B.Tech in Computer Science</h3><p>Poornima University</p><span className="education-date">August 2017 — June 2021</span></div></div></div></section>
-      <section id="contact" data-motion-chapter="contact" className={`contact wrap ${cinematicStyles.sceneSection}`}><CinematicScene variant="orbit" className={cinematicStyles.sectionBackdrop} /><figure className="contact-portrait"><img src="/himanshu-portrait.jpg" alt="Portrait of Himanshu Bhardwaj" width="640" height="800" loading="lazy" /><figcaption><b>Himanshu Bhardwaj</b><span>Senior Product Engineer · Noida</span></figcaption></figure><div><span className="eyebrow">NEXT CONNECTION / 005</span><h2>Complex problem?<br /><em>Let’s build<br />the solution.</em></h2><p>Tell me about your team, your product, and the engineering challenge ahead.</p><a className="button contact-cta" href={`mailto:${email}`}>Start a conversation ↗</a><div className="contact-location"><span aria-hidden="true">◎</span> NOIDA, INDIA / UTC +05:30</div></div><ConnectionPanel /></section>
+      <section id="expertise" data-motion-chapter="expertise" className="section wrap two-column"><div className="section-aside"><span className="eyebrow">TECHNICAL EXPERTISE / 004</span><h2>Depth across<br />the <em>stack.</em></h2><p>Select a discipline to explore its tools and where I’ve applied them.</p><div className="discipline-map" aria-hidden="true"><span>UI</span><i /><span>API</span><i /><span>DB</span></div></div><div><StackWorkbench onLayer={setActiveLayer} /><div className="education"><div className="education-mark" aria-hidden="true">B.TECH<br /><span>CS / 2021</span></div><div><span className="eyebrow">FOUNDATION / EDUCATION</span><h3>B.Tech in Computer Science</h3><p>Poornima University</p><span className="education-date">August 2017 — June 2021</span></div></div></div></section>
+      <section id="contact" data-motion-chapter="contact" className={`contact wrap ${cinematicStyles.sceneSection}`}><figure className="contact-portrait"><img src="/himanshu-portrait.jpg" alt="Portrait of Himanshu Bhardwaj" width="640" height="800" loading="lazy" /><figcaption><b>Himanshu Bhardwaj</b><span>Senior Product Engineer · Noida</span></figcaption></figure><div><span className="eyebrow">NEXT CONNECTION / 005</span><h2>Complex problem?<br /><em>Let’s build<br />the solution.</em></h2><p>Tell me about your team, your product, and the engineering challenge ahead.</p><a className="button contact-cta" href={`mailto:${email}`}>Start a conversation ↗</a><div className="contact-location"><span aria-hidden="true">◎</span> NOIDA, INDIA / UTC +05:30</div></div><ConnectionPanel /></section>
     </main>
     <footer className="wrap"><span>Himanshu Bhardwaj · {new Date().getFullYear()}</span><button onClick={() => window.print()}>Print this page ↗</button><a href="#overview">Back to top ↑</a></footer>
   </>;

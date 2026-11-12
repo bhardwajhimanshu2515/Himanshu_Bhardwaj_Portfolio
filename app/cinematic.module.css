@@ -1,84 +1,120 @@
-.scene {
-  position: relative;
-  min-width: 0;
+.world {
+  position: fixed;
+  inset: 0 0 auto;
+  height: 100dvh;
+  z-index: -1;
   overflow: hidden;
+  pointer-events: none;
+  opacity: .39;
+  background: radial-gradient(ellipse at 68% 48%, #f9861f10, transparent 55%);
 }
 
-.scene canvas {
-  display: block;
+.world canvas {
   width: 100%;
   height: 100%;
+  display: block;
 }
 
-.hero,
-.sceneSection {
+.world[data-rendered] .fallback,
+.world[data-rendered] .fallbackLayers {
+  display: none;
+}
+
+.fallback,
+.fallbackLayers {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  translate: calc(-50% + var(--world-offset, 20vw)) -50%;
+  width: min(48vw, 78svh, 680px);
+  scale: var(--world-scale, 1);
+  rotate: var(--world-turn, 0deg);
+}
+
+.fallback {
+  opacity: calc(1 - var(--world-layer-blend, 0) * .84);
+}
+
+.fallback img {
+  display: block;
+  width: 100%;
+  height: auto;
+  mask-image: radial-gradient(ellipse closest-side, black 52%, #000e 78%, transparent);
+}
+
+.fallbackLayers {
+  display: grid;
+  justify-items: center;
+  gap: 18px;
+  opacity: var(--world-layer-blend, 0);
+}
+
+.fallbackLayers i {
+  display: block;
+  width: 72%;
+  height: 42px;
+  border: 1px solid #ba6a32;
+  background: linear-gradient(90deg, #924a19, #271508);
+  transform: skew(-27deg);
+}
+
+.world[data-layer="0"] .fallbackLayers i:nth-child(1),
+.world[data-layer="1"] .fallbackLayers i:nth-child(2),
+.world[data-layer="2"] .fallbackLayers i:nth-child(3),
+.world[data-layer="3"] .fallbackLayers i {
+  background: linear-gradient(90deg, #ed9b48, #67310b);
+  box-shadow: 0 0 24px #ff9c46;
+}
+
+:global(main:has(> [data-portfolio-scene])) {
   isolation: isolate;
 }
 
+:global(html[data-theme="light"]) .world img {
+  filter: none;
+}
+
+:global(html[data-theme="light"]) .world {
+  opacity: .26;
+}
+
+.overview {
+  padding-block: clamp(44px, 8vw, 92px) 42px;
+  border-bottom: 1px solid var(--line);
+}
+
+.overview h1 {
+  font-size: clamp(38px, 5.7vw, 76px);
+}
+
+.role {
+  margin-top: 13px;
+  color: var(--ink);
+  font-size: clamp(15px, 2vw, 21px);
+}
+
+.overview :global(.impact-strip) {
+  margin-top: clamp(34px, 6vw, 68px);
+}
+
 .sceneSection {
   position: relative;
 }
 
-.sectionBackdrop {
-  position: absolute;
-  inset: 0 0 auto auto;
-  width: min(76%, 1000px);
-  height: clamp(200px, 31vw, 420px);
-  z-index: -1;
-  pointer-events: none;
-  opacity: .58;
-  mask-image: radial-gradient(ellipse at 55% 50%, black 18%, transparent 72%);
-}
-
-.brain {
-  height: clamp(275px, 29vw, 400px);
-  margin-block: 3px;
-  background:
-    radial-gradient(ellipse at center, #f4752c25, transparent 62%),
-    repeating-linear-gradient(0deg, transparent 0 25px, #ff995e0b 26px 27px),
-    repeating-linear-gradient(90deg, transparent 0 25px, #ff995e0b 26px 27px),
-    #120c09;
-  mask-image: radial-gradient(ellipse at center, black 38%, transparent 76%);
-}
-
-:global(html[data-theme="light"]) .brain {
-  background:
-    radial-gradient(ellipse at center, #8c4b1a1a, transparent 62%),
-    repeating-linear-gradient(0deg, transparent 0 25px, #c9843920 26px 27px),
-    repeating-linear-gradient(90deg, transparent 0 25px, #c9843920 26px 27px);
-}
-
-:global(html[data-theme="light"]) .brain canvas {
-  /* The root light-theme filter turns these brighter traces into copper ink. */
-  filter: brightness(.82) saturate(1.25);
-}
-
-.brain:not([data-rendered])::before {
-  content: "";
-  position: absolute;
-  inset: 50% auto auto 50%;
-  width: min(63%, 250px);
-  aspect-ratio: 1;
-  transform: translate(-50%, -50%);
-  border-radius: 50%;
-  border: 1px solid #f9732b80;
-  background: radial-gradient(circle, #ff8a4655 0%, #7c2e1c38 55%, transparent 75%);
-  box-shadow: 0 0 55px #ed64192e, inset 0 0 40px #ff8a4635;
-}
-
 @media (max-width: 760px) {
-  .hero::before {
-    inset-inline: 0;
+  .world {
+    opacity: .21;
   }
 
-  .sectionBackdrop {
-    width: 100%;
-    opacity: .45;
+  .fallback,
+  .fallbackLayers {
+    width: min(82vw, 56svh);
+    translate: -50% -50%;
   }
 }
 
 @media print {
-  .scene {
-    display: none !important;
-  }
+  .world { display: none; }
+  .overview { padding: 0; }
+  .overview h1 { display: block; font-size: 24px; }
 }

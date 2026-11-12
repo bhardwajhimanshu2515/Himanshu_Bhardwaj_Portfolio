@@ -68,29 +68,6 @@
   opacity: calc(0.59 * (1 - var(--entrance-peel)));
 }
 
-:global(html[data-portfolio-entrance]) .content :global([data-hero-art])::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: radial-gradient(ellipse at center, #ffbd6499 0%, #ff71264e 13%, transparent 29%);
-  transform-origin: center;
-  pointer-events: none;
-  animation: entrance-heartbeat 0.94s ease-out infinite;
-}
-
-@keyframes entrance-heartbeat {
-  0%, 42%, 100% { opacity: .25; transform: scale(.91); }
-  12% { opacity: .93; transform: scale(1.09); }
-  22% { opacity: .35; transform: scale(.95); }
-  32% { opacity: .68; transform: scale(1.02); }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  :global(html[data-portfolio-entrance]) .content :global([data-hero-art])::after {
-    animation: none;
-  }
-}
-
 .controls {
   position: absolute;
   inset: auto 14px max(24px, env(safe-area-inset-bottom)) 14px;
