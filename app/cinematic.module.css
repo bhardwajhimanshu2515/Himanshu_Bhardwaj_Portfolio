@@ -42,7 +42,15 @@
 }
 
 :global(html[data-theme="light"]) .brain {
-  filter: invert(1) hue-rotate(180deg);
+  background:
+    radial-gradient(ellipse at center, #8c4b1a1a, transparent 62%),
+    repeating-linear-gradient(0deg, transparent 0 25px, #c9843920 26px 27px),
+    repeating-linear-gradient(90deg, transparent 0 25px, #c9843920 26px 27px);
+}
+
+:global(html[data-theme="light"]) .brain canvas {
+  /* The root light-theme filter turns these brighter traces into copper ink. */
+  filter: brightness(.82) saturate(1.25);
 }
 
 .brain:not([data-rendered])::before {
