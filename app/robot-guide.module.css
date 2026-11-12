@@ -1,0 +1,115 @@
+.guide {
+  position: fixed;
+  z-index: 18;
+  inset: auto max(18px, env(safe-area-inset-right)) max(56px, calc(env(safe-area-inset-bottom) + 12px)) auto;
+  display: grid;
+  justify-items: end;
+  gap: 8px;
+  pointer-events: none;
+}
+
+:global(html[data-portfolio-entrance]) .guide {
+  visibility: hidden;
+}
+
+.trigger {
+  display: grid;
+  justify-items: center;
+  gap: 3px;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  pointer-events: auto;
+}
+
+.figure {
+  display: grid;
+  place-items: center;
+  position: relative;
+  width: clamp(83px, 10vw, 130px);
+  aspect-ratio: 4 / 5;
+  isolation: isolate;
+}
+
+.figure canvas,
+.figure img {
+  position: absolute;
+  display: block;
+  width: 100%;
+  height: 100%;
+  inset: 0;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 10px #21150e4d);
+}
+
+.figure img {
+  transform: perspective(380px) rotateY(var(--guide-yaw, 0deg)) rotateX(var(--guide-pitch, 0deg));
+}
+
+.figure[data-robot-rendered] img {
+  visibility: hidden;
+}
+
+.label {
+  max-width: 145px;
+  padding: 6px 8px;
+  background: var(--panel);
+  border: 1px solid var(--line-strong);
+  border-radius: 5px;
+  color: var(--muted-strong);
+  font: 500 11px/1.2 var(--mono);
+  text-align: center;
+}
+
+.highlight {
+  width: min(264px, calc(100vw - 38px));
+  padding: 13px 14px;
+  border: 1px solid var(--line-strong);
+  border-radius: 6px;
+  background: var(--panel);
+  color: var(--ink);
+  box-shadow: 0 8px 32px color-mix(in srgb, var(--shadow) 22%, transparent);
+  pointer-events: auto;
+}
+
+.highlight strong {
+  display: block;
+  font-size: 14px;
+}
+
+.highlight p {
+  margin: 5px 0 8px;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+.highlight a {
+  color: var(--accent);
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  min-height: 32px;
+  font-size: 12px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+@media (max-width: 760px) {
+  .guide {
+    right: max(10px, env(safe-area-inset-right));
+  }
+
+  .figure {
+    width: 78px;
+  }
+
+  .label {
+    font-size: 10px;
+  }
+}
+
+@media print {
+  .guide { display: none; }
+}
