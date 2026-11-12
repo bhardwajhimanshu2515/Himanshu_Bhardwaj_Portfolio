@@ -142,5 +142,5 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
     if (burstSignal) controls.current?.pulse();
   }, [burstSignal]);
 
-  return <div ref={hostRef} className={[styles.scene, styles[variant], className].filter(Boolean).join(" ")} aria-hidden="true" />;
+  return <div ref={hostRef} data-hero-sphere={variant === "brain" ? "" : undefined} className={[styles.scene, styles[variant], className].filter(Boolean).join(" ")} aria-hidden="true" />;
 }

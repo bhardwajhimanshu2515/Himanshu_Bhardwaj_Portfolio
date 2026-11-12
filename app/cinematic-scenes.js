@@ -420,12 +420,13 @@ function revealCloth(group) {
         float hemDistance = min(min(fabric.x, 1.0 - fabric.x), min(fabric.y, 1.0 - fabric.y));
         float hem = 1.0 - smoothstep(0.005, 0.017, hemDistance);
         float glow = exp(-9.0 * length((fabric - vec2(0.5, 0.56)) * vec2(0.78, 1.0)));
-        vec3 color = vec3(0.012, 0.008, 0.006)
-          + diffuse * vec3(0.028, 0.020, 0.016)
-          + satin * vec3(0.20, 0.15, 0.12)
-          + (0.56 * rim + 0.44 * hem) * vec3(0.12, 0.059, 0.029);
-        color += glow * flash * vec3(0.55, 0.20, 0.045);
-        gl_FragColor = vec4(color, 1.0 - smoothstep(0.76, 0.98, peel));
+        vec3 color = vec3(0.015, 0.019, 0.023)
+          + diffuse * vec3(0.034, 0.041, 0.047)
+          + satin * vec3(0.17, 0.19, 0.21)
+          + (0.56 * rim + 0.44 * hem) * vec3(0.090, 0.100, 0.110);
+        color += glow * flash * vec3(0.14, 0.090, 0.041);
+        float opacity = (0.48 + 0.16 * rim + 0.08 * hem) * (1.0 - smoothstep(0.66, 0.98, peel));
+        gl_FragColor = vec4(color, opacity);
         #include <colorspace_fragment>
       }
     `,

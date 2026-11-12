@@ -53,6 +53,7 @@ export function PortfolioEntrance({ children }) {
       }
       overlay.style.setProperty("--entrance-peel", progress);
       content.style.setProperty("--entrance-zoom", 1 + 0.075 * (1 - progress));
+      content.style.setProperty("--entrance-blur", `${5 * (1 - progress)}px`);
       view?.draw(time, progress);
       frame = requestAnimationFrame(update);
     }
@@ -126,6 +127,7 @@ export function PortfolioEntrance({ children }) {
       root.removeAttribute("data-portfolio-entrance-active");
       content.inert = false;
       content.style.removeProperty("--entrance-zoom");
+      content.style.removeProperty("--entrance-blur");
       overlay.style.removeProperty("--entrance-peel");
       overlay.removeAttribute("data-dragging");
       overlay.removeEventListener("wheel", wheel);
