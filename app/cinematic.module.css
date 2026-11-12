@@ -1,0 +1,76 @@
+.scene {
+  position: relative;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.scene canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.hero,
+.sceneSection {
+  isolation: isolate;
+}
+
+.sceneSection {
+  position: relative;
+}
+
+.sectionBackdrop {
+  position: absolute;
+  inset: 0 0 auto auto;
+  width: min(76%, 1000px);
+  height: clamp(200px, 31vw, 420px);
+  z-index: -1;
+  pointer-events: none;
+  opacity: .58;
+  mask-image: radial-gradient(ellipse at 55% 50%, black 18%, transparent 72%);
+}
+
+.brain {
+  height: clamp(275px, 29vw, 400px);
+  margin-block: 3px;
+  background:
+    radial-gradient(ellipse at center, #f4752c25, transparent 62%),
+    repeating-linear-gradient(0deg, transparent 0 25px, #ff995e0b 26px 27px),
+    repeating-linear-gradient(90deg, transparent 0 25px, #ff995e0b 26px 27px),
+    #120c09;
+  mask-image: radial-gradient(ellipse at center, black 38%, transparent 76%);
+}
+
+:global(html[data-theme="light"]) .brain {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+.brain:not([data-rendered])::before {
+  content: "";
+  position: absolute;
+  inset: 50% auto auto 50%;
+  width: min(63%, 250px);
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  border-radius: 50%;
+  border: 1px solid #f9732b80;
+  background: radial-gradient(circle, #ff8a4655 0%, #7c2e1c38 55%, transparent 75%);
+  box-shadow: 0 0 55px #ed64192e, inset 0 0 40px #ff8a4635;
+}
+
+@media (max-width: 760px) {
+  .hero::before {
+    inset-inline: 0;
+  }
+
+  .sectionBackdrop {
+    width: 100%;
+    opacity: .45;
+  }
+}
+
+@media print {
+  .scene {
+    display: none !important;
+  }
+}
