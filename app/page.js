@@ -4,6 +4,7 @@ import { CinematicScene } from "./cinematic";
 import { useScrollChapters } from "./scroll-chapters";
 import cinematicStyles from "./cinematic.module.css";
 import heroStyles from "./reactor-hero.module.css";
+import { ReactorCutaway } from "./reactor-cutaway";
 const email = "bhardwajhimanshu2515@gmail.com";
 const linkedin = "https://www.linkedin.com/in/mern-full-stack-developer";
 const github = "https://github.com/bhardwajhimanshu2515";
@@ -249,9 +250,10 @@ export default function Home() {
             <img src="/reactor-hero.webp" alt="" fetchPriority="high" width="1600" height="900" />
           </div>
           <div className="wrap">
-          <div className={`hero-copy ${heroStyles.copy}`}><div className="hero-id"><p className="hello">HIMANSHU BHARDWAJ</p><span className="hero-status"><i /> Open to freelance projects</span></div><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#projects">See Postline <span aria-hidden="true">↗</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
+          <div className={`hero-copy ${heroStyles.copy}`}><div className="hero-id"><p className="hello">HIMANSHU BHARDWAJ</p><span className="hero-status"><i /> Open to freelance projects</span></div><h1>Engineering<br /><span>what’s next.</span></h1><p className="hero-thesis">From the first interaction<br />to the system behind it.</p><p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p><div className="actions"><a className="button" href="#experience">Explore experience <span aria-hidden="true">↗</span></a><a className="text-link" href="#reactor-cutaway">Explore the reactor <span aria-hidden="true">↓</span></a></div><div className="current-position"><span className="position-line" /><p>Senior Product Engineer <span>@ Smart Energy Water</span></p></div></div>
           </div>
         </div>
+        <ReactorCutaway />
         <div className={`wrap ${heroStyles.detail}`}>
           <EngineeringCore />
           <div>
