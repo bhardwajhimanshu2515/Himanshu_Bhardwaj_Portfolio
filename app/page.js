@@ -230,12 +230,17 @@ export default function Home() {
     <main ref={mainRef}>
       <PortfolioScene mainRef={mainRef} signal={signal} activeLayer={activeLayer} />
       <section id="overview" className={`wrap ${cinematicStyles.overview}`} data-motion-chapter="overview">
-        <h1>Himanshu Bhardwaj</h1>
+        <div className={cinematicStyles.opening}>
+          <div className={cinematicStyles.openingCopy}>
+            <h1>Himanshu Bhardwaj</h1>
         <p className={cinematicStyles.role}>Senior Product Engineer at Smart Energy Water</p>
         <p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p>
         <div className="actions">
           <a className="button" href="#projects">Explore projects <span aria-hidden="true">↓</span></a>
           <a className="text-link" href="#experience">View experience <span aria-hidden="true">↗</span></a>
+        </div>
+          </div>
+          <div className={cinematicStyles.openingFrame} data-opening-frame aria-hidden="true" />
         </div>
         <div className="impact-strip">{[["5+","Years of engineering experience"],["20%","Lower application load time¹"],["30%","Higher development efficiency¹"],["25%","Fewer system crashes¹"]].map(([metric,label],index) => <div key={metric}><span className="metric-index">0{index + 1} / {["EXPERIENCE","PERFORMANCE","VELOCITY","RELIABILITY"][index]}</span><strong>{metric}</strong><span>{label}</span></div>)}</div><p className="metric-note">¹ Results from my work on American Water at Smart Energy Water.</p>
       </section>

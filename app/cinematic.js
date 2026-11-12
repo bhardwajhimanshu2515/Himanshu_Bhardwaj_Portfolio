@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { journeyPose, measureJourney } from "./portfolio-journey";
+import { journeyPose, measureJourney, openingShot } from "./portfolio-journey";
 import styles from "./cinematic.module.css";
 
 const circuitRoutes = [
@@ -27,7 +27,8 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
     const main = mainRef.current;
     const fallback = fallbackRef.current;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
-    const narrow = window.matchMedia("(max-width: 760px)");
+    const openingFrame = main.querySelector("[data-opening-frame]");
+    const root = document.documentElement;
     let view;
     let loading = false;
     let failed = false;
@@ -41,6 +42,9 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
     let pulseAnimation;
     let keyframes;
     let pose;
+    let frameBounds;
+    let openingTime = window.scrollY > window.innerHeight * 0.5 ? 1.9 : 0;
+    let openingStart;
     let needsMeasurement = true;
     let needsPose = true;
 
@@ -59,19 +63,55 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
         const height = window.innerHeight;
         const maxScroll = document.documentElement.scrollHeight - height;
         keyframes = measureJourney(main, height, maxScroll, window.scrollY);
+        const rect = openingFrame.getBoundingClientRect();
+        frameBounds = { x: rect.left + rect.width / 2, y: rect.top + window.scrollY + rect.height / 2, width: rect.width, height: rect.height };
         view?.resize();
         needsMeasurement = false;
       }
+      const entranceOpen = root.hasAttribute("data-portfolio-entrance");
+      if (!entranceOpen && openingTime < 1.9 && !motion.matches) {
+        openingStart ??= now;
+        openingTime = Math.min(1.9, (now - openingStart) / 1000);
+        needsPose = true;
+      }
+      const scroll = window.scrollY;
+      const shot = openingShot(motion.matches ? 1.9 : openingTime, scroll, window.innerHeight);
+      if (motion.matches) {
+        shot.angle = 0;
+        shot.roll = 0;
+        shot.elevation = 0;
+      }
       if (needsPose) {
-        pose = journeyPose(keyframes, motion.matches ? 0 : window.scrollY);
-        host.style.setProperty("--world-offset", `${pose[3] * 36}vw`);
-        host.style.setProperty("--world-scale", 7.2 / pose[1]);
-        host.style.setProperty("--world-turn", `${pose[0] * 9}deg`);
+        pose = journeyPose(keyframes, motion.matches ? 0 : scroll);
+        const blend = shot.blend;
+        const x = frameBounds.x - host.clientWidth / 2;
+        const y = host.clientHeight / 2 - frameBounds.y + scroll;
+        const narrow = host.clientWidth <= 760;
+        const backgroundX = narrow ? 0 : pose[3] * host.clientWidth * 0.36;
+        const worldX = backgroundX * (1 - blend) + x * blend;
+        const worldY = y * blend;
+        const size = Math.min(frameBounds.width, frameBounds.height * 0.88);
+        const backgroundSize = Math.min(host.clientWidth * (narrow ? 0.82 : 0.48), host.clientHeight * 0.68, 680);
+        const artSize = backgroundSize * 7.2 / pose[1] * (1 - blend) + size * blend;
+        host.style.setProperty("--world-x", `${worldX}px`);
+        host.style.setProperty("--world-y", `${-worldY}px`);
+        host.style.setProperty("--world-size", `${artSize}px`);
+        host.style.setProperty("--world-turn", `${(pose[0] * 9 * (1 - blend) - shot.roll * 180 / Math.PI)}deg`);
+        host.style.setProperty("--world-scale", 1 / (1 + (shot.distance - 1) * blend));
         host.style.setProperty("--world-layer-blend", pose[4]);
+        host.style.setProperty("--opening-blend", blend);
         needsPose = false;
       }
-      if (view && !motion.matches && !narrow.matches) {
-        view.draw(time, pose, pulse, step, layer);
+      if (view && !motion.matches) {
+        const viewportHeight = host.clientHeight;
+        view.draw(time, pose, pulse, step, layer, {
+          ...shot,
+          x: 2 * frameBounds.x / host.clientWidth - 1,
+          y: 1 - 2 * (frameBounds.y - scroll) / viewportHeight,
+          size: Math.min(frameBounds.width, frameBounds.height) / viewportHeight,
+        });
+        schedule();
+      } else if (!entranceOpen && openingTime < 1.9 && !motion.matches) {
         schedule();
       } else {
         previous = 0;
@@ -108,11 +148,11 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
     }
 
     async function initialize() {
-      if (view || loading || failed || motion.matches || narrow.matches) return;
+      if (view || loading || failed || motion.matches) return;
       loading = true;
       try {
         const { createPortfolioScene } = await import("./cinematic-scenes");
-        if (disposed || motion.matches || narrow.matches) return;
+        if (disposed || motion.matches) return;
         view = createPortfolioScene(host);
         view.canvas.addEventListener("webglcontextlost", onContextLost);
         host.dataset.rendered = "true";
@@ -126,7 +166,7 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
     }
 
     function onMediaChange() {
-      if (motion.matches || narrow.matches) releaseView();
+      if (motion.matches) releaseView();
       else void initialize();
       if (motion.matches) pulseAnimation?.cancel();
       onResize();
@@ -150,24 +190,28 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
       },
     };
 
+    const entrance = new MutationObserver(onScroll);
+    entrance.observe(root, { attributes: true, attributeFilter: ["data-portfolio-entrance"] });
     const dimensions = new ResizeObserver(onResize);
     dimensions.observe(main);
+    dimensions.observe(openingFrame);
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize);
     document.addEventListener("visibilitychange", onVisibility);
     motion.addEventListener("change", onMediaChange);
-    narrow.addEventListener("change", onMediaChange);
+
     onMediaChange();
 
     return () => {
       disposed = true;
       cancelAnimationFrame(frame);
       dimensions.disconnect();
+      entrance.disconnect();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
       document.removeEventListener("visibilitychange", onVisibility);
       motion.removeEventListener("change", onMediaChange);
-      narrow.removeEventListener("change", onMediaChange);
+
       pulseAnimation?.cancel();
       releaseView();
       controls.current = null;

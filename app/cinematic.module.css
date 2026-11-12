@@ -5,11 +5,24 @@
   z-index: -1;
   overflow: hidden;
   pointer-events: none;
-  opacity: .46;
+  opacity: calc(.46 + var(--opening-blend, 1) * .52);
   background: radial-gradient(ellipse at 68% 48%, #f9861f10, transparent 55%);
 }
 
+.world::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: calc(var(--world-size, 45vw) * 1.20);
+  aspect-ratio: 1;
+  translate: calc(-50% + var(--world-x, 20vw)) calc(-50% + var(--world-y, 0px));
+  background: radial-gradient(ellipse closest-side, #150c06 30%, #211309c7 64%, transparent);
+  opacity: var(--opening-blend, 1);
+}
+
 .world canvas {
+  position: relative;
   width: 100%;
   height: 100%;
   display: block;
@@ -25,8 +38,8 @@
   position: absolute;
   top: 50%;
   left: 50%;
-  translate: calc(-50% + var(--world-offset, 20vw)) -50%;
-  width: min(48vw, 78svh, 680px);
+  translate: calc(-50% + var(--world-x, 20vw)) calc(-50% + var(--world-y, 0px));
+  width: var(--world-size, min(48vw, 78svh, 680px));
   scale: var(--world-scale, 1);
   rotate: var(--world-turn, 0deg);
 }
@@ -149,16 +162,36 @@
 }
 
 :global(html[data-theme="light"]) .world {
-  opacity: .34;
+  filter: invert(1) hue-rotate(180deg);
+  opacity: calc(.27 + var(--opening-blend, 1) * .70);
 }
 
 .overview {
-  padding-block: clamp(44px, 8vw, 92px) 42px;
+  padding-block: clamp(24px, 4vw, 56px) 42px;
   border-bottom: 1px solid var(--line);
 }
 
+.opening {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.04fr);
+  align-items: center;
+  gap: clamp(24px, 5vw, 72px);
+}
+
+.openingCopy {
+  position: relative;
+  z-index: 1;
+}
+
+.openingFrame {
+  min-width: 0;
+  min-height: clamp(330px, 48vw, 650px);
+}
+
 .overview h1 {
-  font-size: clamp(38px, 5.7vw, 76px);
+  font-size: clamp(43px, 6.1vw, 94px);
+  line-height: .98;
+  max-width: 9ch;
 }
 
 .role {
@@ -176,19 +209,24 @@
 }
 
 @media (max-width: 760px) {
-  .world {
-    opacity: .32;
+  .opening {
+    grid-template-columns: 1fr;
+    gap: 8px;
   }
 
-  .fallback,
-  .fallbackLayers {
-    width: min(82vw, 56svh);
-    translate: -50% -50%;
+  .openingFrame {
+    min-height: clamp(255px, 78vw, 385px);
+  }
+
+  .overview h1 {
+    max-width: 13ch;
   }
 }
 
 @media print {
   .world { display: none; }
   .overview { padding: 0; }
+  .opening { display: block; }
+  .openingFrame { display: none; }
   .overview h1 { display: block; font-size: 24px; }
 }

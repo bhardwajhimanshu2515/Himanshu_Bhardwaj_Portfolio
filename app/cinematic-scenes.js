@@ -324,6 +324,7 @@ export function createPortfolioScene(host) {
   const signal = glowingPoints(new Float32Array(30 * 3), 0xffc276, 12, 1, 30);
   signal.frustumCulled = false;
   reactor.add(signal);
+  const offsetVector = new THREE.Vector3();
   const signalPoints = signal.geometry.attributes.position;
   signalPoints.setUsage(THREE.DynamicDrawUsage);
   host.append(renderer.domElement);
@@ -341,17 +342,29 @@ export function createPortfolioScene(host) {
       });
       renderer.setSize(width, height, false);
     },
-    draw(time, pose, pulse, step, selectedLayer) {
+    draw(time, pose, pulse, step, selectedLayer, opening) {
       const [angle, distance, elevation, offset, open] = pose;
-      const sin = Math.sin(angle);
-      const cos = Math.cos(angle);
-      camera.position.set(sin * distance, elevation, cos * distance);
+      const blend = opening.blend;
+      const orbit = angle + opening.angle * blend;
+      const halfFov = Math.tan(camera.fov * Math.PI / 360);
+      const framedDistance = 1.93 / (Math.max(opening.size, 0.20) * halfFov);
+      const cameraDistance = THREE.MathUtils.lerp(distance, framedDistance * opening.distance, blend);
+      camera.position.set(Math.sin(orbit) * cameraDistance, elevation + opening.elevation * blend, Math.cos(orbit) * cameraDistance);
       camera.lookAt(0, 0, 0);
-      const shift = offset * distance * Math.tan(camera.fov * Math.PI / 360) * camera.aspect;
-      reactor.position.set(cos * shift, open * -1.9, -sin * shift);
+      camera.rotateZ(opening.roll);
+      const depth = camera.position.length() * halfFov;
+      const backgroundOffset = camera.aspect < 0.85 ? offset * 0.35 : offset;
+      offsetVector.set(
+        THREE.MathUtils.lerp(backgroundOffset, opening.x, blend) * depth * camera.aspect,
+        opening.y * blend * depth,
+        0,
+      ).applyQuaternion(camera.quaternion);
+      reactor.position.copy(offsetVector);
+      reactor.position.y -= open * 1.9;
       reactor.visible = open < 0.98;
       reactor.rotation.y = time * 0.12;
-      pedestal.position.set(cos * shift, -2.02, -sin * shift);
+      pedestal.position.copy(offsetVector);
+      pedestal.position.y -= 2.02;
       pedestal.scale.setScalar(1 - open * 0.6);
       pedestal.visible = open < 0.94;
       const beat = reactor.visible ? updateReactor(time, pulse) : 0;
@@ -368,7 +381,7 @@ export function createPortfolioScene(host) {
       }
 
       stack.group.visible = open > 0.015;
-      stack.group.position.set(cos * shift, 0, -sin * shift);
+      stack.group.position.copy(offsetVector);
       stack.group.rotation.set(0.12, angle + time * 0.09, -0.10);
       stack.group.scale.setScalar(open);
       stack.layers.forEach(({ layer, surface, outline }, index) => {

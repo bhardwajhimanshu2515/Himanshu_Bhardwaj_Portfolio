@@ -25,3 +25,18 @@ export function journeyPose(keyframes, scroll) {
   }
   return keyframes.at(-1).pose;
 }
+
+
+export function openingShot(seconds, scroll, height) {
+  const clamp = value => Math.max(0, Math.min(1, value));
+  const smooth = value => value * value * (3 - 2 * value);
+  const arrival = smooth(clamp(seconds / 1.9));
+  const departure = smooth(clamp(scroll / Math.max(1, height * 0.68)));
+  return {
+    angle: (1 - arrival) * -0.95 + departure * 0.26,
+    distance: 1.24 - arrival * 0.24,
+    elevation: (1 - arrival) * 1.1,
+    roll: (1 - arrival) * -0.43 + Math.sin(departure * Math.PI) * 0.25,
+    blend: 1 - departure,
+  };
+}
