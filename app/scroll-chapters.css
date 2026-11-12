@@ -1,0 +1,74 @@
+@media screen and (prefers-reduced-motion: no-preference) {
+  [data-motion-chapter] {
+    --chapter-travel: 1;
+  }
+
+  [data-motion-chapter="overview"] .hero-copy {
+    translate: 0 calc(var(--chapter-progress, 0) * -20px * var(--chapter-travel));
+  }
+
+  [data-motion-chapter="overview"] [data-hero-sphere] {
+    scale: calc(1 - var(--chapter-progress, 0) * .10 * var(--chapter-travel));
+  }
+
+  [data-motion-chapter="projects"] .postline-flow {
+    translate: 0 calc(var(--chapter-arrival, 0) * 40px * var(--chapter-travel));
+  }
+
+  [data-motion-chapter="projects"] .flow-rail {
+    position: relative;
+  }
+
+  [data-motion-chapter="projects"] .flow-rail::after {
+    content: "";
+    position: absolute;
+    inset: auto 0 0;
+    height: 1px;
+    pointer-events: none;
+    background: linear-gradient(90deg, #60814655, #d6ff91);
+    transform: scaleX(var(--chapter-progress, 1));
+    transform-origin: left;
+  }
+
+  [data-motion-chapter="lab"] .system-explorer {
+    translate: 0 calc(var(--chapter-arrival, 0) * 38px * var(--chapter-travel));
+    rotate: y calc(var(--chapter-arrival, 0) * -8deg * var(--chapter-travel));
+  }
+
+  [data-motion-chapter="experience"] .career-log {
+    translate: 0 calc(var(--chapter-arrival, 0) * 28px * var(--chapter-travel));
+  }
+
+  [data-motion-chapter="method"] .method-pipeline article {
+    translate: 0 calc(var(--chapter-arrival, 0) * var(--chapter-offset, 0px) * var(--chapter-travel));
+  }
+
+  [data-motion-chapter="method"] .method-pipeline article:nth-child(1) { --chapter-offset: 32px; }
+  [data-motion-chapter="method"] .method-pipeline article:nth-child(2) { --chapter-offset: 19px; }
+  [data-motion-chapter="method"] .method-pipeline article:nth-child(3) { --chapter-offset: 7px; }
+  [data-motion-chapter="method"] .method-pipeline article:nth-child(4) { --chapter-offset: -6px; }
+
+  [data-motion-chapter="expertise"] .stack-workbench {
+    scale: calc(1 - var(--chapter-arrival, 0) * .045 * var(--chapter-travel));
+    translate: 0 calc(var(--chapter-arrival, 0) * 30px * var(--chapter-travel));
+    transform-origin: top center;
+  }
+
+  [data-motion-chapter="contact"] .contact-portrait {
+    scale: calc(1 - var(--chapter-arrival, 0) * .09 * var(--chapter-travel));
+  }
+
+  [data-motion-chapter="contact"] .connection-panel {
+    translate: 0 calc(var(--chapter-arrival, 0) * 32px * var(--chapter-travel));
+  }
+
+  [data-motion-chapter] :is(.postline-flow, .system-explorer, .stack-workbench, .connection-panel):focus-within {
+    translate: none;
+    rotate: none;
+    scale: none;
+  }
+}
+
+@media (max-width: 760px) {
+  [data-motion-chapter] { --chapter-travel: .42; }
+}

@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useRef, useState } from "react";
 import { CinematicScene } from "./cinematic";
+import { useScrollChapters } from "./scroll-chapters";
 import cinematicStyles from "./cinematic.module.css";
 const email = "bhardwajhimanshu2515@gmail.com";
 const linkedin = "https://www.linkedin.com/in/mern-full-stack-developer";
@@ -55,7 +56,7 @@ function Projects() {
     ["03", "It goes live", "LinkedIn Posts API", "A cron runs every minute and claims due posts atomically, so nothing posts twice. Failures retry after 2, 10 and 30 minutes."],
   ];
   const facts = [["7", "tools for Claude"], ["2", "OAuth flows"], ["36", "end-to-end checks"], ["8", "post types"]];
-  return <section id="projects" className={`projects wrap ${cinematicStyles.sceneSection}`} aria-labelledby="projects-title">
+  return <section id="projects" data-motion-chapter="projects" className={`projects wrap ${cinematicStyles.sceneSection}`} aria-labelledby="projects-title">
     <CinematicScene variant="field" className={cinematicStyles.sectionBackdrop} />
     <div className="projects-head"><span className="eyebrow">FEATURED PROJECT / 000</span><span className="projects-status"><i /> Submitted to the Claude Connectors Directory</span></div>
     <div className="postline-grid">
@@ -190,7 +191,7 @@ function EngineeringMethod() {
     ["03", "Validation", "Verify the behavior.", "Automated component tests and hands-on debugging of production issues.", "Jest / Enzyme"],
     ["04", "Iteration", "Improve the outcome.", "Performance optimization, query improvements, and reusable foundations.", "Performance / Reuse"],
   ];
-  return <section className={`method-section ${cinematicStyles.sceneSection}`}><CinematicScene variant="stack" className={cinematicStyles.sectionBackdrop} /><div className="wrap">
+  return <section data-motion-chapter="method" className={`method-section ${cinematicStyles.sceneSection}`}><CinematicScene variant="stack" className={cinematicStyles.sectionBackdrop} /><div className="wrap">
     <div className="method-heading"><div><span className="eyebrow">ENGINEERING METHOD / 003</span><h2>Think in systems.<br /><em>Deliver in details.</em></h2></div><p>Four connected parts of how I build and improve products.</p></div>
     <div className="method-pipeline">{stages.map(([number,label,title,copy,tech])=><article key={number}>
       <div className="method-terminal"><span>{number}</span><b>{label}</b><i aria-hidden="true">→</i></div>
@@ -227,7 +228,9 @@ function ThemeToggle() {
 }
 export default function Home() {
   const [menu, setMenu] = useState(false);
+  const mainRef = useRef(null);
   useFx3D();
+  useScrollChapters(mainRef);
   return <>
     <a className="skip" href="#overview">Skip to content</a>
     <header className="header">
@@ -238,8 +241,8 @@ export default function Home() {
       <a className="header-download" href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>Download résumé <span aria-hidden="true">↓</span></a>
       <button className="menu-toggle" aria-expanded={menu} aria-controls="navigation" onClick={() => setMenu(!menu)}>{menu ? "Close" : "Menu"}</button>
     </header>
-    <main>
-      <section id="overview" className={`hero wrap ${cinematicStyles.hero}`}>
+    <main ref={mainRef}>
+      <section id="overview" data-motion-chapter="overview" className={`hero wrap ${cinematicStyles.hero}`}>
         <div className="workspace-path"><span><span aria-hidden="true">⌘</span> workspace</span><span>/</span><span>himanshu-bhardwaj</span><span>/</span><b>overview.tsx</b></div>
         <div className="hero-intro"><span className="eyebrow"><i /> SENIOR PRODUCT ENGINEER / FULL STACK</span><span className="location">NOIDA, INDIA · UTC +05:30</span></div>
         <div className="hero-grid">
@@ -249,17 +252,17 @@ export default function Home() {
         <div className="impact-strip">{[["5+","Years of engineering experience"],["20%","Lower application load time¹"],["30%","Higher development efficiency¹"],["25%","Fewer system crashes¹"]].map(([metric,label],index) => <div key={metric}><span className="metric-index">0{index + 1} / {["EXPERIENCE","PERFORMANCE","VELOCITY","RELIABILITY"][index]}</span><strong>{metric}</strong><span>{label}</span></div>)}</div><p className="metric-note">¹ Results from my work on American Water at Smart Energy Water.</p>
       </section>
       <Projects />
-      <section className="project-lab wrap" aria-labelledby="lab-title">
+      <section data-motion-chapter="lab" className="project-lab wrap" aria-labelledby="lab-title">
         <div className="lab-introduction"><span className="eyebrow">INSIDE THE WORK / 001</span><h2 id="lab-title">Systems thinking.<br /><em>Production proof.</em></h2><p>Explore the technologies and outcomes behind three products I helped build.</p><div className="lab-index"><span>01—03</span><p>UTILITIES<br />HEALTHCARE<br />HR TECHNOLOGY</p></div><a href="#experience" className="text-link">Read the engineering history ↗</a></div>
         <SystemExplorer />
       </section>
-      <section id="experience" className="section wrap two-column">
+      <section id="experience" data-motion-chapter="experience" className="section wrap two-column">
         <div className="section-aside"><span className="eyebrow">ENGINEERING HISTORY / 002</span><h2>Production work.<br /><em>Proven impact.</em></h2><p>The products, teams, and technical challenges behind the numbers.</p><div className="career-map" aria-hidden="true"><span>2020</span><div><i /><i /><i /><i /><i /><i /></div><span>PRESENT</span></div><div className="career-summary"><strong>06</strong><span>ROLES<br />ONE CONTINUOUS JOURNEY</span></div><a className="text-link" href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>Download full résumé ↓</a></div>
         <div className="career-log"><div className="instrument-label"><span>EXPERIENCE LOG</span><span>NEWEST FIRST</span></div>{roles.map(([date,title,company,product,text,tags], index) => <article className="role" key={date}><div className="role-meta"><span className="role-id">0{roles.length-index}</span><span>{date}</span>{index === 0 && <span className="current">Current role</span>}</div><h3>{title}</h3><p className="company">{company}</p>{product && <span className="product"><span aria-hidden="true">▱ </span> {product}</span>}<p className="role-description">{text}</p><div className="tags">{tags.map(tag => <span key={tag}>{tag}</span>)}</div></article>)}</div>
       </section>
       <EngineeringMethod />
-      <section id="expertise" className="section wrap two-column"><div className="section-aside"><span className="eyebrow">TECHNICAL EXPERTISE / 004</span><h2>Depth across<br />the <em>stack.</em></h2><p>Select a discipline to explore its tools and where I’ve applied them.</p><div className="discipline-map" aria-hidden="true"><span>UI</span><i /><span>API</span><i /><span>DB</span></div></div><div><StackWorkbench /><div className="education"><div className="education-mark" aria-hidden="true">B.TECH<br /><span>CS / 2021</span></div><div><span className="eyebrow">FOUNDATION / EDUCATION</span><h3>B.Tech in Computer Science</h3><p>Poornima University</p><span className="education-date">August 2017 — June 2021</span></div></div></div></section>
-      <section id="contact" className={`contact wrap ${cinematicStyles.sceneSection}`}><CinematicScene variant="orbit" className={cinematicStyles.sectionBackdrop} /><figure className="contact-portrait"><img src="/himanshu-portrait.jpg" alt="Portrait of Himanshu Bhardwaj" width="640" height="800" loading="lazy" /><figcaption><b>Himanshu Bhardwaj</b><span>Senior Product Engineer · Noida</span></figcaption></figure><div><span className="eyebrow">NEXT CONNECTION / 005</span><h2>Complex problem?<br /><em>Let’s build<br />the solution.</em></h2><p>Tell me about your team, your product, and the engineering challenge ahead.</p><a className="button contact-cta" href={`mailto:${email}`}>Start a conversation ↗</a><div className="contact-location"><span aria-hidden="true">◎</span> NOIDA, INDIA / UTC +05:30</div></div><ConnectionPanel /></section>
+      <section id="expertise" data-motion-chapter="expertise" className="section wrap two-column"><div className="section-aside"><span className="eyebrow">TECHNICAL EXPERTISE / 004</span><h2>Depth across<br />the <em>stack.</em></h2><p>Select a discipline to explore its tools and where I’ve applied them.</p><div className="discipline-map" aria-hidden="true"><span>UI</span><i /><span>API</span><i /><span>DB</span></div></div><div><StackWorkbench /><div className="education"><div className="education-mark" aria-hidden="true">B.TECH<br /><span>CS / 2021</span></div><div><span className="eyebrow">FOUNDATION / EDUCATION</span><h3>B.Tech in Computer Science</h3><p>Poornima University</p><span className="education-date">August 2017 — June 2021</span></div></div></div></section>
+      <section id="contact" data-motion-chapter="contact" className={`contact wrap ${cinematicStyles.sceneSection}`}><CinematicScene variant="orbit" className={cinematicStyles.sectionBackdrop} /><figure className="contact-portrait"><img src="/himanshu-portrait.jpg" alt="Portrait of Himanshu Bhardwaj" width="640" height="800" loading="lazy" /><figcaption><b>Himanshu Bhardwaj</b><span>Senior Product Engineer · Noida</span></figcaption></figure><div><span className="eyebrow">NEXT CONNECTION / 005</span><h2>Complex problem?<br /><em>Let’s build<br />the solution.</em></h2><p>Tell me about your team, your product, and the engineering challenge ahead.</p><a className="button contact-cta" href={`mailto:${email}`}>Start a conversation ↗</a><div className="contact-location"><span aria-hidden="true">◎</span> NOIDA, INDIA / UTC +05:30</div></div><ConnectionPanel /></section>
     </main>
     <footer className="wrap"><span>Himanshu Bhardwaj · {new Date().getFullYear()}</span><button onClick={() => window.print()}>Print this page ↗</button><a href="#overview">Back to top ↑</a></footer>
   </>;

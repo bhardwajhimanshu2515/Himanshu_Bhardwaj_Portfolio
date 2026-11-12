@@ -318,8 +318,25 @@ function ambientScene(group, variant) {
     cube.dispose();
     edges.dispose();
   }
-  return time => {
+  return (time, burst, progress) => {
+    const entrance = progress ?? 1;
+    const arrival = 1 - THREE.MathUtils.smoothstep(entrance, 0, 1);
     form.rotation.set(0.46 + Math.sin(time * 0.27) * 0.18, 0.32 + time * 0.18, -0.18);
+    if (variant === "field") {
+      form.rotation.x += arrival * 0.56;
+      form.rotation.z -= arrival * 0.23;
+      form.position.x = -arrival * 1.6;
+      form.scale.y = 1 + arrival * 0.8;
+    } else if (variant === "stack") {
+      const spread = Math.sin(Math.PI * entrance);
+      form.children.forEach((layer, index) => {
+        layer.position.y = (index - 2.5) * 0.39 * spread;
+        layer.rotation.y = index * (0.18 + spread * 0.22);
+      });
+    } else {
+      form.rotation.y -= arrival * 1.2;
+      form.position.z = -arrival * 1.1;
+    }
   };
 }
 
@@ -333,6 +350,7 @@ export function createScene(host, variant) {
   scene.add(group);
   const update = brain ? brainScene(group) : ambientScene(group, variant);
 
+  let restDistance = 0;
   host.append(renderer.domElement);
 
   return {
@@ -340,14 +358,17 @@ export function createScene(host, variant) {
       const width = Math.max(host.clientWidth, 1);
       const height = Math.max(host.clientHeight, 1);
       camera.aspect = width / height;
-      camera.position.z = (brain ? 6.9 : 6.1) / Math.min(camera.aspect, 1);
+      restDistance = (brain ? 6.9 : 6.1) / Math.min(camera.aspect, 1);
+      camera.position.z = restDistance;
       camera.updateProjectionMatrix();
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
       renderer.setSize(width, height, false);
     },
-    draw(time, pointer, burst) {
-      group.rotation.set(0.16 + pointer.y * 0.16, time * (brain ? 0.29 : 0.09) + pointer.x * 0.35, 0);
-      update(time, burst);
+    draw(time, pointer, burst, progress = null) {
+      const dolly = brain ? THREE.MathUtils.smoothstep(progress ?? 0, 0, 1) : 0;
+      camera.position.z = restDistance + dolly * 0.72;
+      group.rotation.set(0.16 + pointer.y * 0.16, time * (brain ? 0.29 : 0.09) + pointer.x * 0.35 + dolly * 0.54, 0);
+      update(time, burst, progress);
       renderer.render(scene, camera);
     },
     dispose() {

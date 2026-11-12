@@ -10,6 +10,7 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
   useEffect(() => {
     const host = hostRef.current;
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const chapter = host.closest("[data-motion-chapter]");
     const pointer = { x: 0, y: 0 };
     const target = { x: 0, y: 0 };
     let view;
@@ -22,6 +23,11 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
     let time = 0;
     let burst = 0;
 
+    function draw() {
+      const progress = motion.matches ? null : chapter?.style.getPropertyValue("--chapter-progress");
+      view.draw(time, pointer, burst, progress ? Number(progress) : null);
+    }
+
     function render(now) {
       frame = 0;
       const delta = previous ? Math.min((now - previous) / 1000, 0.05) : 0;
@@ -30,7 +36,7 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
       burst = Math.max(0, burst - delta * 0.54);
       pointer.x += (target.x - pointer.x) * 0.065;
       pointer.y += (target.y - pointer.y) * 0.065;
-      view.draw(time, pointer, burst);
+      draw();
       start();
     }
 
@@ -51,10 +57,15 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
       start();
     }
 
+    function onMotionChange() {
+      if (view && !contextLost) draw();
+      sync();
+    }
+
     function resize() {
       if (!view || contextLost) return;
       view.resize();
-      view.draw(time, pointer, burst);
+      draw();
     }
 
     function onContextLost(event) {
@@ -114,7 +125,7 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
         if (!motion.matches) burst = 1;
       },
     };
-    motion.addEventListener("change", sync);
+    motion.addEventListener("change", onMotionChange);
     document.addEventListener("visibilitychange", sync);
     host.addEventListener("pointermove", move);
     host.addEventListener("pointerleave", resetPointer);
@@ -124,7 +135,7 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
       stop();
       intersection.disconnect();
       dimensions.disconnect();
-      motion.removeEventListener("change", sync);
+      motion.removeEventListener("change", onMotionChange);
       document.removeEventListener("visibilitychange", sync);
       host.removeEventListener("pointermove", move);
       host.removeEventListener("pointerleave", resetPointer);
