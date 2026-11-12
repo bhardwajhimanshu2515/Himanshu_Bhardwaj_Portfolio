@@ -12,19 +12,6 @@
   overflow: hidden;
   pointer-events: none;
   opacity: calc(.46 + var(--opening-blend, 1) * .52);
-  background: radial-gradient(ellipse at 68% 48%, #f9861f10, transparent 55%);
-}
-
-.world::before {
-  content: "";
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: calc(var(--world-size, 45vw) * 1.20);
-  aspect-ratio: 1;
-  translate: calc(-50% + var(--world-x, 20vw)) calc(-50% + var(--world-y, 0px));
-  background: radial-gradient(ellipse closest-side, #150c06 30%, #211309c7 64%, transparent);
-  opacity: var(--opening-blend, 1);
 }
 
 .world canvas {
@@ -58,7 +45,15 @@
   display: block;
   width: 100%;
   height: auto;
-  mask-image: radial-gradient(ellipse closest-side, black 52%, #000e 78%, transparent);
+  visibility: hidden;
+}
+
+.fallback::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 49.3% 49.2%, #fff6ca 0%, #ffd88a 26%, #ec9d43 76%);
+  mask: url("/circuit-sphere-hd.webp") center / 100% 100% no-repeat luminance;
 }
 
 .electricity,
@@ -99,7 +94,6 @@
 }
 
 @media screen and (prefers-reduced-motion: no-preference) {
-  .fallback img,
   .fallback::before,
   .electricity {
     transform: scale(calc(1 + var(--reactor-beat, 0) * .035));
@@ -170,23 +164,10 @@
 
 :global(html[data-theme="light"]) .world {
   opacity: calc(.27 + var(--opening-blend, 1) * .70);
-  background: none;
-}
-
-:global(html[data-theme="light"]) .world::before {
-  display: none;
-}
-
-:global(html[data-theme="light"]) .world img {
-  visibility: hidden;
 }
 
 :global(html[data-theme="light"]) .fallback::before {
-  content: "";
-  position: absolute;
-  inset: 0;
   background: #a34d0c;
-  mask: url("/circuit-sphere-hd.webp") center / 100% 100% no-repeat luminance;
 }
 
 :global(html[data-theme="light"]) .heartbeat {
