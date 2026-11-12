@@ -49,6 +49,7 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
     const motion = window.matchMedia("(prefers-reduced-motion: reduce)");
     const openingFrame = main.querySelector("[data-opening-frame]");
     const root = document.documentElement;
+    const heading = main.querySelector("[data-cinematic-title]");
     let view;
     let loading = false;
     let failed = false;
@@ -64,6 +65,7 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
     let keyframes;
     let pose;
     let frameBounds;
+    let titleBounds;
     let openingTime = window.scrollY > window.innerHeight * 0.5 ? 1.9 : 0;
     let openingStart;
     let needsMeasurement = true;
@@ -87,6 +89,23 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
         const rect = openingFrame.getBoundingClientRect();
         frameBounds = { x: rect.left + rect.width / 2, y: rect.top + window.scrollY + rect.height / 2, width: rect.width, height: rect.height };
         view?.resize();
+        if (view && openingTime < 1.9 && !motion.matches) {
+          const title = heading.getBoundingClientRect();
+          const font = getComputedStyle(heading);
+          titleBounds = { x: title.left + title.width / 2, y: title.top + window.scrollY + title.height / 2 };
+          view.layoutTitle([...heading.querySelectorAll("span")].map(word => {
+            const bounds = word.getBoundingClientRect();
+            return {
+              text: word.textContent,
+              x: bounds.left + bounds.width / 2 - titleBounds.x,
+              y: title.top + title.height / 2 - bounds.top - bounds.height / 2,
+              width: word.offsetWidth,
+              height: word.offsetHeight,
+              font: `${font.fontWeight} ${font.fontSize} ${font.fontFamily}`,
+              spacing: font.letterSpacing,
+            };
+          }));
+        }
         needsMeasurement = false;
       }
       const entranceOpen = root.hasAttribute("data-portfolio-entrance");
@@ -123,6 +142,16 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
         host.style.setProperty("--opening-blend", blend);
         needsPose = false;
       }
+      const titleProgress = motion.matches || entranceOpen ? 1 : openingTime / 1.9;
+      const titleActive = titleProgress < 1 && scroll < window.innerHeight * 0.28;
+      const webglTitle = titleActive && Boolean(view && titleBounds);
+      if (titleActive) {
+        heading.style.setProperty("--title-progress", titleProgress);
+        heading.dataset.titleMotion = webglTitle ? "webgl" : "fallback";
+      } else if (heading.hasAttribute("data-title-motion")) {
+        delete heading.dataset.titleMotion;
+        heading.style.removeProperty("--title-progress");
+      }
       if (view && !motion.matches) {
         const viewportHeight = host.clientHeight;
         const phase = heartbeatAnimation?.effect?.getComputedTiming().progress ?? 0;
@@ -132,7 +161,12 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
           x: 2 * frameBounds.x / host.clientWidth - 1,
           y: 1 - 2 * (frameBounds.y - scroll) / viewportHeight,
           size: Math.min(frameBounds.width, frameBounds.height) / viewportHeight,
-        });
+        }, webglTitle ? {
+          progress: titleProgress,
+          x: titleBounds.x,
+          y: titleBounds.y - scroll,
+          light: root.dataset.theme === "light",
+        } : null);
         schedule();
       } else if (!entranceOpen && openingTime < 1.9 && !motion.matches) {
         schedule();
@@ -247,6 +281,8 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
       pulseAnimation?.cancel();
       heartbeatAnimation?.cancel();
       releaseView();
+      delete heading.dataset.titleMotion;
+      heading.style.removeProperty("--title-progress");
       controls.current = null;
     };
   }, [mainRef]);

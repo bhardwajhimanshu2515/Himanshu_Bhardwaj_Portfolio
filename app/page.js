@@ -232,7 +232,7 @@ export default function Home() {
       <section id="overview" className={`wrap ${cinematicStyles.overview}`} data-motion-chapter="overview">
         <div className={cinematicStyles.opening}>
           <div className={cinematicStyles.openingCopy}>
-            <h1>Himanshu Bhardwaj</h1>
+            <h1 data-cinematic-title><span>Himanshu</span>{" "}<span>Bhardwaj</span></h1>
         <p className={cinematicStyles.role}>Senior Product Engineer at Smart Energy Water</p>
         <p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p>
         <div className="actions">
