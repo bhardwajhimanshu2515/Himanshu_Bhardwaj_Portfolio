@@ -82,6 +82,84 @@ function orbitalRings(group, color, radius, count) {
   return rings;
 }
 
+function circuitShell(group, random) {
+  const shell = new THREE.Group();
+  const copper = [];
+  const gold = [];
+  const junctions = [];
+  const routes = [];
+  for (const radius of [1.29, 1.56, 1.81]) {
+    for (let index = 0; index < 165; index++) {
+      const azimuth = random() * TAU;
+      const latitude = Math.asin(random() * 1.86 - 0.93);
+      const sweep = 0.12 + random() * 0.64;
+      const step = (random() - 0.5) * 0.37;
+      const segments = random() < 0.22 ? gold : copper;
+      const route = [];
+      for (let point = 0; point <= 22; point++) {
+        const progress = point / 22;
+        const angle = azimuth + sweep * (Math.min(progress, 0.48) + Math.max(progress - 0.64, 0));
+        const height = latitude + step * THREE.MathUtils.clamp((progress - 0.48) / 0.16, 0, 1);
+        const ring = radius * Math.cos(height);
+        route.push(new THREE.Vector3(ring * Math.cos(angle), radius * Math.sin(height), ring * Math.sin(angle)));
+        if (point > 0) segments.push(...route[point - 1], ...route[point]);
+        if (point % 11 === 0) junctions.push(...route[point]);
+      }
+      if (index % 5 === 0) routes.push(route);
+    }
+  }
+  shell.add(lineSegments(copper, 0xfe781b, 0.28));
+  shell.add(lineSegments(gold, 0xffba49, 0.53));
+  shell.add(glowingPoints(junctions, 0xffa02d, 4.8, 0.65));
+  group.add(shell);
+  return { shell, routes };
+}
+
+function reactorCore(group, random) {
+  const core = orbitalRings(group, 0xffd067, 0.16, 7);
+  const amber = [];
+  const lights = [];
+  for (let index = 0; index < 120; index++) {
+    const angle = index * TAU / 120;
+    const radius = 0.23 + random() * 0.8;
+    const end = new THREE.Vector3(radius * Math.cos(angle), radius * Math.sin(angle), (random() - 0.5) * 0.48);
+    const inner = end.clone().multiplyScalar(0.19);
+    if (index % 3 === 0) amber.push(...inner, ...end);
+    lights.push(...end);
+  }
+  core.add(lineSegments(amber, 0xffac36, 0.47));
+  core.add(glowingPoints(lights, 0xffaa29, 7, 0.78));
+  const glow = new THREE.Mesh(new THREE.PlaneGeometry(2.2, 1.7), new THREE.ShaderMaterial({
+    uniforms: { energy: { value: 0.7 } },
+    vertexShader: `
+      varying vec2 coords;
+      void main() {
+        coords = uv * 2.0 - 1.0;
+        vec4 center = modelViewMatrix * vec4(0.0, 0.0, 0.0, 1.0);
+        vec2 scale = vec2(length(modelViewMatrix[0].xyz), length(modelViewMatrix[1].xyz));
+        gl_Position = projectionMatrix * (center + vec4(position.xy * scale, 0.0, 0.0));
+      }
+    `,
+    fragmentShader: `
+      uniform float energy;
+      varying vec2 coords;
+      void main() {
+        float r = length(coords);
+        float glow = exp(-r * 7.0) * (1.0 - smoothstep(0.65, 1.0, r));
+        float flare = exp(-abs(coords.y) * 85.0 - abs(coords.x) * 4.5);
+        gl_FragColor = vec4(mix(vec3(1.0, 0.32, 0.018), vec3(1.0, 0.86, 0.44), exp(-r * 5.0)),
+          energy * (glow + 0.32 * flare));
+        #include <colorspace_fragment>
+      }
+    `,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  }));
+  group.add(glow);
+  return { core, glow };
+}
+
 function brainScene(group) {
   const random = randomSequence(4801);
   const neurons = [];
@@ -120,8 +198,8 @@ function brainScene(group) {
       for (let i = 1; i < samples.length; i++) strands.push(...samples[i - 1], ...samples[i]);
     }
   });
-  group.add(lineSegments(strands, 0xff7525, 0.34));
-  group.add(glowingPoints(neurons.flatMap(point => [...point]), 0xff7d2e, 9, 0.84));
+  group.add(lineSegments(strands, 0xff7525, 0.18));
+  group.add(glowingPoints(neurons.flatMap(point => [...point]), 0xff7d2e, 5.5, 0.54));
 
   const shell = [];
   for (let i = 0; i < 420; i++) {
@@ -131,7 +209,16 @@ function brainScene(group) {
     shell.push(1.58 * r * Math.cos(angle), 1.58 * y, 1.58 * r * Math.sin(angle));
   }
   group.add(glowingPoints(shell, 0xff6d21, 3.4, 0.45));
-  const rings = orbitalRings(group, 0xff8b3d, 1.72, 4);
+  const rings = orbitalRings(group, 0xffa338, 1.65, 5);
+  const { shell: circuitry, routes } = circuitShell(group, random);
+  const { core, glow } = reactorCore(group, random);
+  const current = glowingPoints(new Float32Array(routes.length * 3), 0xffc359, 8, 0.84);
+  current.frustumCulled = false;
+  circuitry.add(current);
+  const currentPositions = current.geometry.attributes.position;
+  currentPositions.setUsage(THREE.DynamicDrawUsage);
+  const activity = current.geometry.attributes.strength;
+  activity.setUsage(THREE.DynamicDrawUsage);
   const sparks = glowingPoints(new Float32Array(68 * 5 * 3), 0xff9e43, 7.2, 0.92, 5);
   sparks.frustumCulled = false;
   group.add(sparks);
@@ -145,7 +232,31 @@ function brainScene(group) {
   }));
 
   return (time, burst) => {
+    // A short second beat follows the first, with a longer rest between pairs.
+    const cycle = (time + 0.35) % 0.94;
+    const firstBeat = Math.exp(-Math.pow((cycle - 0.12) / 0.047, 2));
+    const secondBeat = Math.exp(-Math.pow((cycle - 0.31) / 0.071, 2));
+    const heartbeat = firstBeat + 0.52 * secondBeat;
+    const thought = time * 0.18;
     rings.rotation.set(0.38, time * 0.19, 0.24 - time * 0.11);
+    circuitry.rotation.set(0.09, -time * 0.14, -0.14);
+    circuitry.scale.setScalar(1 + 0.025 * heartbeat);
+    core.rotation.set(time * 0.42, time * 0.29, -time * 0.3);
+    core.scale.setScalar(1 + 0.11 * heartbeat);
+    glow.scale.setScalar(1 + 0.13 * heartbeat);
+    glow.material.uniforms.energy.value = 0.52 + 0.45 * heartbeat + burst * 0.28;
+    routes.forEach((route, index) => {
+      const phase = (time * (0.24 + index % 6 * 0.07) + index * 0.618) % 1;
+      const offset = phase * (route.length - 1);
+      const segment = Math.floor(offset);
+      point.copy(route[segment]).lerp(route[segment + 1], offset - segment);
+      currentPositions.setXYZ(index, point.x, point.y, point.z);
+      const longitude = Math.atan2(point.z, point.x) / TAU;
+      const cluster = Math.pow(Math.max(0, Math.cos(TAU * (longitude - thought) + point.y * 0.9)), 5);
+      activity.setX(index, Math.min(1, 0.32 + 0.58 * cluster + 0.17 * heartbeat + burst * 0.19));
+    });
+    currentPositions.needsUpdate = true;
+    activity.needsUpdate = true;
     sparks.material.uniforms.opacity.value = 0.74 + burst * 0.26;
     sparks.material.uniforms.size.value = 7.2 + burst * 3;
     paths.forEach(({ curve, phase, speed }, index) => {
