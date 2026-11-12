@@ -323,6 +323,46 @@ function ambientScene(group, variant) {
   };
 }
 
+export function createScene(host, variant) {
+  const brain = variant === "brain";
+  const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
+  renderer.setClearColor(0x000000, 0);
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(39, 1, 0.1, 40);
+  const group = new THREE.Group();
+  scene.add(group);
+  const update = brain ? brainScene(group) : ambientScene(group, variant);
+
+  host.append(renderer.domElement);
+
+  return {
+    resize() {
+      const width = Math.max(host.clientWidth, 1);
+      const height = Math.max(host.clientHeight, 1);
+      camera.aspect = width / height;
+      camera.position.z = (brain ? 6.9 : 6.1) / Math.min(camera.aspect, 1);
+      camera.updateProjectionMatrix();
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5));
+      renderer.setSize(width, height, false);
+    },
+    draw(time, pointer, burst) {
+      group.rotation.set(0.16 + pointer.y * 0.16, time * (brain ? 0.29 : 0.09) + pointer.x * 0.35, 0);
+      update(time, burst);
+      renderer.render(scene, camera);
+    },
+    dispose() {
+      scene.traverse(object => {
+        object.geometry?.dispose();
+        object.material?.dispose();
+      });
+      renderer.forceContextLoss();
+      renderer.dispose();
+      renderer.domElement.remove();
+    },
+    canvas: renderer.domElement,
+  };
+}
+
 function revealCloth(group) {
   const material = new THREE.ShaderMaterial({
     uniforms: { peel: { value: 0 }, clock: { value: 0 }, flash: { value: 0 } },
@@ -401,18 +441,12 @@ function revealCloth(group) {
   return cloth;
 }
 
-export function createScene(host, variant) {
-  const brain = variant === "brain";
+export function createEntranceScene(host) {
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setClearColor(0x000000, 0);
   const scene = new THREE.Scene();
   const camera = new THREE.PerspectiveCamera(39, 1, 0.1, 40);
-  const group = new THREE.Group();
-  scene.add(group);
-  const update = brain ? brainScene(group) : ambientScene(group, variant);
-
-  const cloth = brain ? revealCloth(scene) : null;
-  let restingDistance = 0;
+  const cloth = revealCloth(scene);
   host.append(renderer.domElement);
 
   return {
@@ -420,33 +454,24 @@ export function createScene(host, variant) {
       const width = Math.max(host.clientWidth, 1);
       const height = Math.max(host.clientHeight, 1);
       camera.aspect = width / height;
-      restingDistance = (brain ? 6.9 : 6.1) / Math.min(camera.aspect, 1);
-      camera.position.z = restingDistance;
       camera.updateProjectionMatrix();
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, brain ? 2 : 1.5));
+      cloth.scale.set(Math.max(camera.aspect, 0.8), 1.17, 1);
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
       renderer.setSize(width, height, false);
     },
-    draw(time, pointer, burst, reveal = 1) {
-      const progress = brain ? THREE.MathUtils.smoothstep(reveal, 0, 1) : 1;
-      const pushIn = Math.sin(Math.PI * progress);
-      if (cloth) {
-        camera.position.z = restingDistance * (1 - 0.12 * pushIn);
-        cloth.visible = progress < 0.98;
-        cloth.material.uniforms.peel.value = progress;
-        cloth.material.uniforms.clock.value = time;
-        cloth.material.uniforms.flash.value = 0.33 + Math.pow(Math.max(0, Math.sin(time * 4)), 8) * 0.65;
-      }
-      group.rotation.set(0.16 + pointer.y * 0.16, time * (brain ? 0.29 : 0.09) + pointer.x * 0.35 + 0.42 * pushIn, 0);
-      update(time, burst);
+    draw(time, progress) {
+      const peel = THREE.MathUtils.smoothstep(progress, 0, 1);
+      camera.position.z = 5.4 + 1.9 * peel;
+      cloth.material.uniforms.peel.value = peel;
+      cloth.material.uniforms.clock.value = time;
+      cloth.material.uniforms.flash.value = 0.26 + 0.19 * Math.pow(Math.max(0, Math.sin(time * 2)), 5);
       renderer.render(scene, camera);
     },
     dispose() {
-      scene.traverse(object => {
-        object.geometry?.dispose();
-        object.material?.dispose();
-      });
-      renderer.forceContextLoss();
+      cloth.geometry.dispose();
+      cloth.material.dispose();
       renderer.dispose();
+      renderer.forceContextLoss();
       renderer.domElement.remove();
     },
     canvas: renderer.domElement,

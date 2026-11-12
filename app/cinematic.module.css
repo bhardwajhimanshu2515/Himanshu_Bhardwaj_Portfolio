@@ -30,10 +30,6 @@
   mask-image: radial-gradient(ellipse at 55% 50%, black 18%, transparent 72%);
 }
 
-.revealStage {
-  position: relative;
-}
-
 .brain {
   height: clamp(275px, 29vw, 400px);
   margin-block: 3px;
@@ -68,41 +64,6 @@
   border: 1px solid #f9732b80;
   background: radial-gradient(circle, #ff8a4655 0%, #7c2e1c38 55%, transparent 75%);
   box-shadow: 0 0 55px #ed64192e, inset 0 0 40px #ff8a4635;
-}
-
-.revealControls {
-  display: none;
-  position: absolute;
-  inset: auto 8px 8px;
-  justify-content: space-between;
-  align-items: center;
-  gap: 8px;
-  color: #e2b998;
-  font: 11px var(--mono);
-}
-
-.brain[data-rendered] + .revealControls {
-  display: flex;
-}
-
-.revealControls button {
-  min-height: 44px;
-  padding: 6px 12px;
-  color: #ffd2a2;
-  background: #21150f;
-  border: 1px solid #61412c;
-  border-radius: 4px;
-  font: inherit;
-}
-
-.revealControls button:hover {
-  border-color: #f3a86f;
-}
-
-@media (prefers-reduced-motion: reduce), print {
-  .brain[data-rendered] + .revealControls {
-    display: none;
-  }
 }
 
 @media (max-width: 760px) {
