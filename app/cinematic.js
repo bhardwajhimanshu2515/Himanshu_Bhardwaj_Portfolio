@@ -4,6 +4,19 @@ import { useEffect, useRef } from "react";
 import { journeyPose, measureJourney } from "./portfolio-journey";
 import styles from "./cinematic.module.css";
 
+const circuitRoutes = [
+  "M552 688 L515 655 L448 655 L425 626 L337 626 L320 600 L221 600 L190 562 L107 562",
+  "M552 688 L592 656 L658 656 L686 615 L743 615 L775 572 L858 572 L884 528 L1008 528",
+  "M552 688 L517 725 L478 725 L447 768 L375 768 L335 810 L246 810 L224 852 L115 852",
+  "M552 688 L597 731 L649 731 L681 774 L749 774 L773 813 L854 813 L890 849 L1006 849",
+  "M552 688 L550 609 L528 568 L528 498 L499 475 L499 387 L471 352 L471 261",
+  "M552 688 L577 762 L577 835 L609 859 L609 942 L641 983 L641 1107 L680 1139",
+  "M96 438 L179 438 L206 411 L277 411 L305 374 L385 374 L417 339 L513 339 L552 303 L677 303",
+  "M349 1101 L434 1101 L459 1062 L545 1062 L580 1032 L673 1032 L706 997 L800 997 L836 960 L919 960",
+  "M198 991 L254 991 L287 945 L346 945 L369 904 L424 904 L455 858 L519 858 L552 809 L552 688",
+  "M927 363 L859 363 L832 400 L768 400 L730 447 L666 447 L640 494 L595 494 L568 547 L552 688",
+];
+
 export function PortfolioScene({ mainRef, signal, activeLayer }) {
   const hostRef = useRef(null);
   const fallbackRef = useRef(null);
@@ -172,6 +185,13 @@ export function PortfolioScene({ mainRef, signal, activeLayer }) {
   return <div ref={hostRef} className={styles.world} data-portfolio-scene aria-hidden="true">
     <div ref={fallbackRef} className={styles.fallback}>
       <img src="/circuit-sphere-hd.webp" alt="" width="1120" height="1400" />
+      <div className={styles.heartbeat} />
+      <svg className={styles.electricity} viewBox="0 0 1120 1400" aria-hidden="true">
+        {circuitRoutes.map((route, index) => <g key={route} style={{ "--route-index": index }}>
+          <path d={route} pathLength="100" />
+          <path d={route} pathLength="100" />
+        </g>)}
+      </svg>
     </div>
     <div className={styles.fallbackLayers}><i /><i /><i /></div>
   </div>;

@@ -214,7 +214,7 @@ function brainScene(group) {
   const rings = orbitalRings(group, 0xffa338, 1.65, 5);
   const { shell: circuitry, routes } = circuitShell(group, random);
   const { core, glow } = reactorCore(group, random);
-  const current = glowingPoints(new Float32Array(routes.length * 3), 0xffc359, 8, 0.84);
+  const current = glowingPoints(new Float32Array(routes.length * 3), 0xffd98f, 11, 0.98);
   current.frustumCulled = false;
   circuitry.add(current);
   const currentPositions = current.geometry.attributes.position;
@@ -235,9 +235,9 @@ function brainScene(group) {
 
   return (time, burst) => {
     // A short second beat follows the first, with a longer rest between pairs.
-    const cycle = (time + 0.35) % 0.94;
-    const firstBeat = Math.exp(-Math.pow((cycle - 0.12) / 0.047, 2));
-    const secondBeat = Math.exp(-Math.pow((cycle - 0.31) / 0.071, 2));
+    const cycle = (time + 0.35) % 1.38;
+    const firstBeat = Math.exp(-Math.pow((cycle - 0.17) / 0.080, 2));
+    const secondBeat = Math.exp(-Math.pow((cycle - 0.46) / 0.092, 2));
     const heartbeat = firstBeat + 0.52 * secondBeat;
     const thought = time * 0.18;
     rings.rotation.set(0.38, time * 0.19, 0.24 - time * 0.11);
@@ -246,16 +246,16 @@ function brainScene(group) {
     core.rotation.set(time * 0.42, time * 0.29, -time * 0.3);
     core.scale.setScalar(1 + 0.11 * heartbeat);
     glow.scale.setScalar(1 + 0.13 * heartbeat);
-    glow.material.uniforms.energy.value = 0.52 + 0.45 * heartbeat + burst * 0.28;
+    glow.material.uniforms.energy.value = 0.48 + 0.85 * heartbeat + burst * 0.28;
     routes.forEach((route, index) => {
-      const phase = (time * (0.24 + index % 6 * 0.07) + index * 0.618) % 1;
+      const phase = (time * (0.43 + index % 6 * 0.10) + index * 0.618) % 1;
       const offset = phase * (route.length - 1);
       const segment = Math.floor(offset);
       point.copy(route[segment]).lerp(route[segment + 1], offset - segment);
       currentPositions.setXYZ(index, point.x, point.y, point.z);
       const longitude = Math.atan2(point.z, point.x) / TAU;
       const cluster = Math.pow(Math.max(0, Math.cos(TAU * (longitude - thought) + point.y * 0.9)), 5);
-      activity.setX(index, Math.min(1, 0.32 + 0.58 * cluster + 0.17 * heartbeat + burst * 0.19));
+      activity.setX(index, Math.min(1, 0.43 + 0.63 * cluster + 0.23 * heartbeat + burst * 0.19));
     });
     currentPositions.needsUpdate = true;
     activity.needsUpdate = true;
@@ -269,6 +269,7 @@ function brainScene(group) {
       }
     });
     positions.needsUpdate = true;
+    return heartbeat;
   };
 }
 
@@ -348,13 +349,13 @@ export function createPortfolioScene(host) {
       camera.lookAt(0, 0, 0);
       const shift = offset * distance * Math.tan(camera.fov * Math.PI / 360) * camera.aspect;
       reactor.position.set(cos * shift, open * -1.9, -sin * shift);
-      reactor.scale.setScalar(1 - open * 0.60);
       reactor.visible = open < 0.98;
       reactor.rotation.y = time * 0.12;
       pedestal.position.set(cos * shift, -2.02, -sin * shift);
       pedestal.scale.setScalar(1 - open * 0.6);
       pedestal.visible = open < 0.94;
-      if (reactor.visible) updateReactor(time, pulse);
+      const beat = reactor.visible ? updateReactor(time, pulse) : 0;
+      reactor.scale.setScalar((1 - open * 0.60) * (1 + beat * 0.038));
 
       signal.visible = pulse > 0.005;
       if (signal.visible) {
