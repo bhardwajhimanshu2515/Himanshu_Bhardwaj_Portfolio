@@ -293,108 +293,6 @@ function circuitLayers() {
   return { group, layers };
 }
 
-function createTitleShot(renderer) {
-  const scene = new THREE.Scene();
-  const group = new THREE.Group();
-  const camera = new THREE.PerspectiveCamera(36, 1, 0.1, 10000);
-  scene.add(group);
-  let width = 1;
-  let height = 1;
-
-  function dispose() {
-    for (const word of [...group.children]) {
-      word.geometry.dispose();
-      word.material.uniforms.glyph.value.dispose();
-      word.material.dispose();
-      group.remove(word);
-    }
-  }
-
-  return {
-    resize(nextWidth, nextHeight) {
-      width = nextWidth;
-      height = nextHeight;
-      camera.aspect = width / height;
-      camera.updateProjectionMatrix();
-    },
-    layout(words) {
-      dispose();
-      for (const word of words) {
-        if (!word.width || !word.height) continue;
-        const canvas = document.createElement("canvas");
-        canvas.width = word.width * 2;
-        canvas.height = word.height * 2;
-        const context = canvas.getContext("2d");
-        if (!context) continue;
-        context.scale(2, 2);
-        context.font = word.font;
-        context.textAlign = "center";
-        context.textBaseline = "middle";
-        if ("letterSpacing" in context) context.letterSpacing = word.spacing;
-        context.fillStyle = "#fff";
-        context.fillText(word.text, word.width / 2, word.height / 2, word.width);
-        const texture = new THREE.CanvasTexture(canvas);
-        texture.generateMipmaps = false;
-        texture.minFilter = THREE.LinearFilter;
-        const material = new THREE.ShaderMaterial({
-          uniforms: {
-            glyph: { value: texture },
-            ink: { value: new THREE.Color() },
-            progress: { value: 0 },
-            opacity: { value: 1 },
-          },
-          vertexShader: `
-            varying vec2 glyphUv;
-            void main() {
-              glyphUv = uv;
-              gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-            }
-          `,
-          fragmentShader: `
-            uniform sampler2D glyph;
-            uniform vec3 ink;
-            uniform float progress;
-            uniform float opacity;
-            varying vec2 glyphUv;
-            void main() {
-              float alpha = texture2D(glyph, glyphUv).a;
-              float beam = 1.0 - smoothstep(0.025, 0.17, abs(glyphUv.x + glyphUv.y * .27 - (progress * 1.78 - .19)));
-              vec3 color = mix(ink, vec3(1.0, 0.39, 0.055), beam * .80);
-              gl_FragColor = vec4(color, alpha * opacity);
-              #include <colorspace_fragment>
-            }
-          `,
-          transparent: true,
-          depthWrite: false,
-        });
-        const mesh = new THREE.Mesh(new THREE.PlaneGeometry(word.width, word.height), material);
-        mesh.position.set(word.x, word.y, 0);
-        group.add(mesh);
-      }
-    },
-    draw(shot) {
-      const progress = THREE.MathUtils.smoothstep(shot.progress, 0, 1);
-      const remaining = 1 - progress;
-      const distance = height / (2 * Math.tan(camera.fov * Math.PI / 360));
-      camera.position.z = distance * (1 + remaining * 0.22);
-      const projectionScale = camera.position.z / distance;
-      group.position.set((shot.x - width / 2) * projectionScale, (height / 2 - shot.y) * projectionScale - 15 * remaining, 0);
-      group.rotation.set(remaining * -0.22, remaining * -0.52, remaining * -0.12);
-      for (const word of group.children) {
-        const { ink, opacity, progress: sweep } = word.material.uniforms;
-        ink.value.setHex(shot.light ? 0x1d2118 : 0xf1f2e9);
-        opacity.value = 1 - THREE.MathUtils.smoothstep(shot.progress, 0.76, 1);
-        sweep.value = shot.progress;
-      }
-      renderer.autoClear = false;
-      renderer.clearDepth();
-      renderer.render(scene, camera);
-      renderer.autoClear = true;
-    },
-    dispose,
-  };
-}
-
 export function createPortfolioScene(host) {
   const renderer = new THREE.WebGLRenderer({ alpha: true, antialias: true });
   renderer.setClearColor(0x000000, 0);
@@ -420,7 +318,6 @@ export function createPortfolioScene(host) {
   const signal = glowingPoints(new Float32Array(30 * 3), 0xffc276, 12, 1, 30);
   signal.frustumCulled = false;
   reactor.add(signal);
-  const title = createTitleShot(renderer);
   const offsetVector = new THREE.Vector3();
   const signalPoints = signal.geometry.attributes.position;
   signalPoints.setUsage(THREE.DynamicDrawUsage);
@@ -432,7 +329,6 @@ export function createPortfolioScene(host) {
       const height = Math.max(1, host.clientHeight);
       camera.aspect = width / height;
       camera.updateProjectionMatrix();
-      title.resize(width, height);
       const pixelRatio = Math.min(window.devicePixelRatio || 1, 2, Math.max(1, Math.sqrt(4500000 / (width * height))));
       renderer.setPixelRatio(pixelRatio);
       scene.traverse(object => {
@@ -440,8 +336,7 @@ export function createPortfolioScene(host) {
       });
       renderer.setSize(width, height, false);
     },
-    layoutTitle: title.layout,
-    draw(time, pose, pulse, step, selectedLayer, opening, titleFrame) {
+    draw(time, pose, pulse, step, selectedLayer, opening) {
       const [angle, distance, elevation, offset, open] = pose;
       const blend = opening.blend;
       const orbit = angle + opening.angle * blend;
@@ -491,10 +386,8 @@ export function createPortfolioScene(host) {
         outline.color.setHex(selected ? 0xffd395 : 0xc77b3f);
       });
       renderer.render(scene, camera);
-      if (titleFrame) title.draw(titleFrame);
     },
     dispose() {
-      title.dispose();
       scene.traverse(object => {
         object.geometry?.dispose();
         object.material?.dispose();
