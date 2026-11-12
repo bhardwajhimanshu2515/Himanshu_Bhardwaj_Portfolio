@@ -6,6 +6,7 @@ import styles from "./cinematic.module.css";
 export function CinematicScene({ variant, className, burstSignal = 0 }) {
   const hostRef = useRef(null);
   const controls = useRef(null);
+  const brain = variant === "brain";
 
   useEffect(() => {
     const host = hostRef.current;
@@ -21,6 +22,14 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
     let previous = 0;
     let time = 0;
     let burst = 0;
+    let reveal = motion.matches ? 1 : 0;
+    let revealStart = 0;
+    let revealDistance = 1;
+    let manualReveal = false;
+
+    function scrollProgress() {
+      return Math.max(0, Math.min(1, (window.scrollY - revealStart) / revealDistance));
+    }
 
     function render(now) {
       frame = 0;
@@ -30,7 +39,11 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
       burst = Math.max(0, burst - delta * 0.54);
       pointer.x += (target.x - pointer.x) * 0.065;
       pointer.y += (target.y - pointer.y) * 0.065;
-      view.draw(time, pointer, burst);
+      if (brain) {
+        const goal = manualReveal ? 1 : scrollProgress();
+        reveal += (goal - reveal) * (1 - Math.exp(-delta * 9));
+      }
+      view.draw(time, pointer, burst, reveal);
       start();
     }
 
@@ -53,8 +66,12 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
 
     function resize() {
       if (!view || contextLost) return;
+      if (brain) {
+        revealStart = Math.max(0, host.getBoundingClientRect().top + window.scrollY - window.innerHeight * 0.48);
+        revealDistance = Math.min(210, host.clientHeight * 0.52);
+      }
       view.resize();
-      view.draw(time, pointer, burst);
+      view.draw(time, pointer, burst, motion.matches ? 1 : reveal);
     }
 
     function onContextLost(event) {
@@ -97,6 +114,12 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
     const dimensions = new ResizeObserver(resize);
     dimensions.observe(host);
 
+    function onMotionChange() {
+      reveal = motion.matches || manualReveal ? 1 : scrollProgress();
+      resize();
+      sync();
+    }
+
     function move(event) {
       if (event.pointerType === "touch") return;
       const rect = host.getBoundingClientRect();
@@ -113,8 +136,17 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
       pulse() {
         if (!motion.matches) burst = 1;
       },
+      reveal() {
+        if (!motion.matches) {
+          if (manualReveal || reveal > 0.96) reveal = 0;
+          manualReveal = true;
+          burst = 1;
+          start();
+        }
+      },
     };
-    motion.addEventListener("change", sync);
+    motion.addEventListener("change", onMotionChange);
+    if (brain) window.addEventListener("resize", resize);
     document.addEventListener("visibilitychange", sync);
     host.addEventListener("pointermove", move);
     host.addEventListener("pointerleave", resetPointer);
@@ -124,7 +156,8 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
       stop();
       intersection.disconnect();
       dimensions.disconnect();
-      motion.removeEventListener("change", sync);
+      motion.removeEventListener("change", onMotionChange);
+      if (brain) window.removeEventListener("resize", resize);
       document.removeEventListener("visibilitychange", sync);
       host.removeEventListener("pointermove", move);
       host.removeEventListener("pointerleave", resetPointer);
@@ -136,11 +169,20 @@ export function CinematicScene({ variant, className, burstSignal = 0 }) {
       delete host.dataset.rendered;
       controls.current = null;
     };
-  }, [variant]);
+  }, [brain, variant]);
 
   useEffect(() => {
     if (burstSignal) controls.current?.pulse();
   }, [burstSignal]);
 
-  return <div ref={hostRef} className={[styles.scene, styles[variant], className].filter(Boolean).join(" ")} aria-hidden="true" />;
+  const scene = <div ref={hostRef} className={[styles.scene, styles[variant], className].filter(Boolean).join(" ")} aria-hidden="true" />;
+  if (!brain) return scene;
+
+  return <div className={styles.revealStage}>
+    {scene}
+    <div className={styles.revealControls}>
+      <span aria-hidden="true">↓ Scroll to reveal</span>
+      <button type="button" onClick={() => controls.current?.reveal()}>Play reveal <span aria-hidden="true">↗</span></button>
+    </div>
+  </div>;
 }
