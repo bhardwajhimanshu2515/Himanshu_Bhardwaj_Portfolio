@@ -15,13 +15,32 @@ export function createFallbackBeam(figure, overlay) {
       canvas.width = width;
       canvas.height = height;
     },
-    draw({ target, lift, power }) {
+    draw({ target, lift, power, thrust, bank, elapsed }) {
       if (visible) context.clearRect(0, 0, width, height);
-      visible = Boolean(target && power > .005);
+      visible = thrust > .015 || Boolean(target && power > .005);
       if (!visible) return;
 
       const box = figure.getBoundingClientRect();
-      const wristX = box.left + box.width * .27;
+      if (thrust > .015) {
+        context.save();
+        context.translate(box.left + box.width * .54, box.top + box.height * .72);
+        context.rotate(bank * .24);
+        for (const [index, x] of [-.16, .18].entries()) {
+          const length = box.height * .63 * thrust * (.88 + .12 * Math.sin(elapsed * 72 + index * 2));
+          const flame = context.createLinearGradient(0, 0, 0, length);
+          flame.addColorStop(0, "rgba(255, 242, 194, .96)");
+          flame.addColorStop(.34, "rgba(255, 168, 53, .79)");
+          flame.addColorStop(1, "rgba(255, 118, 18, 0)");
+          context.fillStyle = flame;
+          context.beginPath();
+          context.ellipse(box.width * x, length * .43, box.width * .074, length * .57, 0, 0, Math.PI * 2);
+          context.fill();
+        }
+        context.restore();
+      }
+
+      if (!target || power <= .005) return;
+      const wristX = box.left + box.width * (target.x < box.left + box.width / 2 ? .27 : .73);
       const wristY = box.top + box.height * (.76 - lift * .025);
       const angle = Math.atan2(target.y - wristY, target.x - wristX);
       const distance = Math.hypot(target.x - wristX, target.y - wristY);

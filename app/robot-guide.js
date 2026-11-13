@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { createFallbackBeam } from "./robot-beam-fallback";
+import { FLIGHT_TIME, flightPose, headlineDock } from "./robot-flight";
 import styles from "./robot-guide.module.css";
 
 const highlights = {
@@ -42,6 +43,9 @@ export function RobotGuide() {
     let target;
     let switchTime = 0;
     let lift = 0;
+    let dock = { x: 0, y: 0 };
+    let from = dock;
+    let pose = { ...dock, thrust: 0, bank: 0 };
     let view;
     let fallback;
     let disposed = false;
@@ -81,22 +85,23 @@ export function RobotGuide() {
       host.style.setProperty("--guide-pitch", `${pitch * 4}deg`);
 
       const elapsed = Math.max(0, now - switchTime);
-      const settle = moving ? smoothStep(250, 920, elapsed) : 1;
-      const desiredLift = target ? 1 : 0;
-      lift = moving ? lift + (desiredLift - lift) * .12 : desiredLift;
-      const power = target ? smoothStep(150, 420, moving ? elapsed : 420) : 0;
-      const sweptTarget = target && {
-        ...target,
-        x: target.x + (1 - settle) * Math.min(100, target.radiusX * .55),
-        y: target.y + (1 - settle) * 75,
-      };
+      const progress = moving ? Math.min(1, elapsed / FLIGHT_TIME) : 1;
+      pose = flightPose(from, dock, progress);
+      host.style.setProperty("--flight-x", `${pose.x}px`);
+      host.style.setProperty("--flight-y", `${pose.y}px`);
+      host.style.setProperty("--flight-bank", `${pose.bank * 13}deg`);
 
+      const torchTime = moving ? elapsed - FLIGHT_TIME : 500;
+      const settle = smoothStep(0, 360, torchTime);
+      const desiredLift = target && progress === 1 ? 1 : 0;
+      lift = moving ? lift + (desiredLift - lift) * .18 : desiredLift;
+      const power = target ? smoothStep(170, 390, torchTime) : 0;
       const scene = view ?? fallback;
-      scene?.draw({ yaw, pitch, blink, lift, power, target: sweptTarget, elapsed: Math.min(elapsed, 1100) / 1000, settle });
+      scene?.draw({ yaw, pitch, blink, lift, power, target, elapsed: elapsed / 1000, settle, ...pose });
       const landing = scene && target ? power * settle * settle : 0;
       lightHeading(landing > .03 ? current : undefined, landing);
       if (moving && (blinking || Math.abs(yaw - targetYaw) + Math.abs(pitch - targetPitch) > .01 ||
-        (scene && ((target && elapsed < 1100) || Math.abs(lift - desiredLift) > .01)))) schedule();
+        (scene && (progress < 1 || (target && elapsed < FLIGHT_TIME + 500) || Math.abs(lift - desiredLift) > .01)))) schedule();
     }
 
     function update() {
@@ -119,6 +124,7 @@ export function RobotGuide() {
       const inFrame = bounds.top < window.innerHeight * .82 && bounds.bottom > headerBottom + 12;
       const next = inFrame && !page.hasAttribute("data-portfolio-entrance") ? heading : undefined;
       if (current !== next) {
+        from = pose;
         current = next;
         switchTime = performance.now();
       }
@@ -128,6 +134,12 @@ export function RobotGuide() {
         const textBounds = textRange.getBoundingClientRect();
         const top = Math.max(headerBottom + 8, textBounds.top);
         const bottom = Math.min(window.innerHeight - 12, textBounds.bottom);
+        const home = host.getBoundingClientRect();
+        dock = headlineDock(
+          { left: home.left - pose.x, top: home.top - pose.y, width: home.width, height: home.height },
+          { left: textBounds.left, right: textBounds.right, top, bottom },
+          overlay.clientWidth, overlay.clientHeight, headerBottom,
+        );
         target = {
           x: textBounds.left + textBounds.width * .5,
           y: (top + bottom) * .5,
@@ -136,6 +148,7 @@ export function RobotGuide() {
         };
       } else {
         target = undefined;
+        dock = { x: 0, y: 0 };
       }
       schedule();
     }
@@ -158,6 +171,7 @@ export function RobotGuide() {
       if (disposed) return;
       release();
       fallback = createFallbackBeam(host, overlay);
+      from = pose;
       switchTime = performance.now();
       resize();
     }
@@ -187,6 +201,7 @@ export function RobotGuide() {
       if (disposed) return;
       view = createRobotScene(host, overlay);
       view.resize();
+      from = pose;
       switchTime = performance.now();
       if (frame) cancelAnimationFrame(frame);
       render(switchTime);

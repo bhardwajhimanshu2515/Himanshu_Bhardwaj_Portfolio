@@ -121,6 +121,36 @@ function buildTorchArm(root, cloth, seam, metal) {
   return { shoulder, elbow, torch, lens, lensMaterial, spill };
 }
 
+function buildBackpack(root, metal) {
+  const pack = new THREE.Group();
+  pack.position.set(0, .98, -.37);
+  root.add(pack);
+  pack.add(rounded(.64, .62, .27, .12, metal));
+  const brass = new THREE.MeshStandardMaterial({ color: 0x9a6838, metalness: .62, roughness: .37 });
+  const flame = new THREE.MeshBasicMaterial({
+    color: 0xffaa45, transparent: true, opacity: 0, depthWrite: false, toneMapped: false,
+  });
+  const core = new THREE.MeshBasicMaterial({
+    color: 0xffefbe, transparent: true, opacity: 0, depthWrite: false, toneMapped: false,
+  });
+  const plumes = [-.35, .35].map(x => {
+    const nozzle = new THREE.Mesh(new THREE.CylinderGeometry(.09, .115, .23, 16), brass);
+    nozzle.position.set(x, -.22, -.035);
+    pack.add(nozzle);
+    const exhaust = new THREE.Group();
+    exhaust.position.set(x, -.34, -.035);
+    for (const [radius, length, material] of [[.105, .88, flame], [.055, .46, core]]) {
+      const plume = new THREE.Mesh(new THREE.ConeGeometry(radius, length, 16), material);
+      plume.rotation.z = Math.PI;
+      plume.position.y = -length / 2;
+      exhaust.add(plume);
+    }
+    pack.add(exhaust);
+    return exhaust;
+  });
+  return { plumes, flame, core };
+}
+
 function hoodieBot() {
   const root = new THREE.Group();
   const bump = fabricTexture();
@@ -168,6 +198,7 @@ function hoodieBot() {
     addTube(root, [[side*.10,1.39,.25],[side*.13,1.24,.33],[side*.16,.99,.34],[side*.18,.88,.34]],.018,cord);
   }
 
+  const backpack = buildBackpack(root, metal);
   const torchArm = buildTorchArm(root, cloth, seam, metal);
   const head = new THREE.Group();
   head.position.set(0,1.92,0);
@@ -192,7 +223,7 @@ function hoodieBot() {
     eyes.add(light);
   }
   root.rotation.y = -.17;
-  return { root, head, eyes, bump, torchArm };
+  return { root, head, eyes, bump, torchArm, backpack };
 }
 
 export function createRobotScene(figure, overlay) {
@@ -201,7 +232,7 @@ export function createRobotScene(figure, overlay) {
   renderer.autoClear = false;
   const scene = new THREE.Scene();
   const beam = createRobotBeam();
-  const { root, head, eyes, bump, torchArm } = hoodieBot();
+  const { root, head, eyes, bump, torchArm, backpack } = hoodieBot();
   const { shoulder, elbow, torch, lens, lensMaterial, spill } = torchArm;
   scene.add(root);
   const sky = new THREE.HemisphereLight(0xe5ebff, 0x493a32, 2.1);
@@ -237,14 +268,16 @@ export function createRobotScene(figure, overlay) {
       renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.5, Math.sqrt(3200000 / (width * height))));
       renderer.setSize(width, height, false);
     },
-    draw({ yaw, pitch, blink, lift, power, target, elapsed, settle }) {
+    draw({ yaw, pitch, blink, lift, power, target, elapsed, settle, thrust = 0, bank = 0 }) {
       const box = figure.getBoundingClientRect();
       if (!box.height) return;
       const viewportWidth = Math.round(box.width * 1.65);
-      const viewportHeight = Math.round(box.height);
+      const viewportHeight = Math.round(box.height * 1.42);
       const left = Math.round(box.left + (box.width - viewportWidth) * .5);
-      const top = Math.round(box.top);
-      camera.left = -1.46 * viewportWidth / viewportHeight;
+      const top = Math.round(box.top + (box.height - viewportHeight) * .36);
+      camera.top = 1.46 * viewportHeight / box.height;
+      camera.bottom = -camera.top;
+      camera.left = -camera.top * viewportWidth / viewportHeight;
       camera.right = -camera.left;
       camera.updateProjectionMatrix();
 
@@ -253,6 +286,14 @@ export function createRobotScene(figure, overlay) {
       const vertical = THREE.MathUtils.clamp(-targetY / (Math.abs(targetX) + Math.abs(targetY) + 1), -.5, 1);
       root.rotation.y = -.17 + yaw * .12 - lift * .15;
       root.position.y = lift * .05;
+      root.rotation.z = -bank * .26;
+      root.rotation.x = -thrust * .10;
+      backpack.flame.opacity = thrust * .67;
+      backpack.core.opacity = thrust * .91;
+      for (const [index, plume] of backpack.plumes.entries()) {
+        plume.visible = thrust > .015;
+        plume.scale.y = thrust * (.82 + .18 * Math.sin(elapsed * 72 + index * 2));
+      }
       head.rotation.set(pitch * .22 - vertical * lift * .18, yaw * .36 - lift * .18, -yaw * .10 + lift * .04);
       eyes.position.x = yaw * .10 - lift * .055;
       eyes.position.y = .10 - pitch * .07 + vertical * lift * .048;
