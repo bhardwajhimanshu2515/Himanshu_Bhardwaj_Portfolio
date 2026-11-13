@@ -16,7 +16,7 @@ export function createCircuitWorld(host) {
   let seed = 93;
   const random = () => { seed = (seed * 16807) % 2147483647; return seed / 2147483647; };
   const material = opacity => {
-    const value = new THREE.LineBasicMaterial({ color: 0x2998ad, transparent: true, opacity });
+    const value = new THREE.LineBasicMaterial({ color: 0xffba49, transparent: true, opacity });
     materials.push(value);
     return value;
   };
@@ -38,7 +38,7 @@ export function createCircuitWorld(host) {
       line(layer,path);
       const curve = new THREE.CurvePath();
       for (let n=1;n<path.length;n++) curve.add(new THREE.LineCurve3(new THREE.Vector3(...path[n-1]),new THREE.Vector3(...path[n])));
-      const dot = new THREE.Mesh(new THREE.SphereGeometry(.045,6,4),new THREE.MeshBasicMaterial({color:0x7ce9ee}));
+      const dot = new THREE.Mesh(new THREE.SphereGeometry(.045,6,4),new THREE.MeshBasicMaterial({color:0xffd98f}));
       layer.add(dot);
       signals.push({dot,curve,offset:random(),speed:.08+random()*.08});
       const module = new THREE.Group();
@@ -74,7 +74,7 @@ export function createCircuitWorld(host) {
     stars[i]=(random()-.5)*38; stars[i+1]=(random()-.5)*28; stars[i+2]=-random()*8;
   }
   const dust = new THREE.Points(new THREE.BufferGeometry().setAttribute("position",new THREE.BufferAttribute(stars,3)),
-    new THREE.PointsMaterial({color:0x56bdca,size:.025,transparent:true,opacity:.45}));
+    new THREE.PointsMaterial({color:0xffa02d,size:.025,transparent:true,opacity:.45}));
   scene.add(dust);
   let frame=0, previous=0, time=0, pointerX=0, pointerY=0;
   function draw(now) {
