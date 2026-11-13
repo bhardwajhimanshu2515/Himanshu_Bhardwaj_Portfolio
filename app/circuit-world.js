@@ -40,7 +40,7 @@ export function createCircuitWorld(host) {
       for (let n=1;n<path.length;n++) curve.add(new THREE.LineCurve3(new THREE.Vector3(...path[n-1]),new THREE.Vector3(...path[n])));
       const dot = new THREE.Mesh(new THREE.SphereGeometry(.045,6,4),new THREE.MeshBasicMaterial({color:0xffd98f}));
       layer.add(dot);
-      signals.push({dot,curve,offset:random(),speed:.20+random()*.20});
+      signals.push({dot,curve,offset:random(),speed:.28+random()*.28});
       const module = new THREE.Group();
       module.position.set(x,y,0);
       layer.add(module);
@@ -52,14 +52,14 @@ export function createCircuitWorld(host) {
             points.push([Math.cos(angle)*(.5+r*.13),Math.sin(angle)*(.5+r*.13),0]);
           }
           const ring=line(module,points,r===1?bright:fine);
-          rings.push({ring,speed:(r%2?1:-1)*(.30+random()*.50)});
+          rings.push({ring,speed:(r%2?1:-1)*(.525+random()*.875)});
         }
       } else {
         line(module,[[-.65,-.9,0],[.65,-.9,0],[.65,.7,0],[.45,.9,0],[-.65,.9,0],[-.65,-.9,0]]);
         for(let bar=0;bar<9;bar++) {
           const object=line(module,[[0,0,0],[.85,0,0]],bright);
           object.position.set(-.48,-.68+bar*.16,0);
-          panels.push({object,phase:random()*6,speed:1.25+random()*2.5});
+          panels.push({object,phase:random()*6,speed:1.75+random()*3.5});
         }
         for(let pin=0;pin<6;pin++) {
           const py=-.65+pin*.25;
