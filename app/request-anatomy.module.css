@@ -5,10 +5,10 @@
 .toolbar { display:flex; justify-content:space-between; align-items:center; gap:16px; padding:18px 22px; border-bottom:1px solid var(--line); font:11px var(--mono); color:var(--muted); }
 .toolbar div { display:flex; gap:8px; }
 .toolbar button { padding:10px 12px; border:1px solid var(--line-strong); border-radius:6px; background:var(--surface-raised); }
-.scene { height:460px; position:relative; touch-action:pan-y; }
+.scene { height:500px; position:relative; touch-action:pan-y; }
 .scene canvas { width:100%;height:100%;display:block; }
 .fallback { position:absolute; inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:30px;gap:18px;text-align:center;color:var(--muted); }
-.steps { display:grid;grid-template-columns:repeat(5,1fr);border-block:1px solid var(--line); }
+.steps { display:grid;grid-template-columns:repeat(6,1fr);border-block:1px solid var(--line); }
 .steps button { background:transparent;border:0;border-right:1px solid var(--line);padding:18px 12px;text-align:left;font-size:12px;line-height:1.5;transition:background 180ms ease,color 180ms ease; }
 .steps button[aria-pressed="true"] { background:var(--surface-selected);color:var(--accent); }
 .steps span { display:block;font:10px var(--mono);margin-bottom:6px;color:var(--muted); }
@@ -17,7 +17,7 @@
 .caption p { max-width:800px;line-height:1.8;color:var(--muted);font-size:14px; }
 .note { font-size:11px;line-height:1.8;color:var(--muted);margin-top:14px; }
 .note a { text-decoration:underline;text-underline-offset:3px; }
-@media(max-width:700px) { .heading { display:block; }.heading p{margin-top:16px}.toolbar{align-items:start;flex-direction:column}.scene{height:370px}.steps{grid-template-columns:1fr 1fr}.steps button:last-child{grid-column:1/-1}.caption{min-height:210px} }
+@media(max-width:700px) { .heading { display:block; }.heading p{margin-top:16px}.toolbar{align-items:start;flex-direction:column}.scene{height:370px}.steps{grid-template-columns:1fr 1fr}.caption{min-height:210px} }
 @media(prefers-reduced-motion:reduce) { .steps button{transition:none} }
 /* Match shared type and touch-target scale. */
 .toolbar button { min-height:44px; font-size:12px; }
@@ -25,3 +25,14 @@
 .note { font-size:12px; }
 .steps button:focus-visible { outline-offset:-3px; }
 @media(max-width:700px) { .toolbar div{flex-wrap:wrap}.caption{min-height:240px} }
+
+.legend,.routing { display:flex; flex-wrap:wrap; justify-content:space-between; gap:12px; padding:16px 24px; border-top:1px solid var(--line); color:var(--muted); font-size:12px; }
+.routing { align-items:center; }
+.routing div { display:flex; flex-wrap:wrap; gap:8px; }
+.routing button { min-height:44px;padding:10px 14px;border:1px solid var(--line-strong);border-radius:6px;background:var(--panel);font-size:12px; }
+.routing button[aria-pressed=true] { background:var(--surface-selected);color:var(--accent);border-color:var(--accent); }
+.readout { display:block; margin-top:20px; padding:12px 16px; background:var(--surface-inset);border-left:2px solid var(--accent);color:var(--accent);font:12px/1.6 var(--mono); }
+.caption { min-height:240px; }
+.caption h3 { margin-top:10px; }
+.steps button[aria-pressed=true] { box-shadow:inset 0 -3px var(--accent); }
+@media(max-width:700px) { .scene { height:320px; }.caption { min-height:350px; }.legend,.routing{padding:16px}.heading h2{font-size:34px}.toolbar{padding:16px}.toolbar div{gap:8px}.steps{grid-template-columns:repeat(2,1fr)} }

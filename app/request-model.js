@@ -1,0 +1,10 @@
+// One illustrative API read; not a claim about this portfolio's deployment.
+export const requestStages = [
+  { title: "Frontend", label: "Browser · React", detail: "You open a project. React handles the interaction and fetch sends an HTTPS request to /api/projects. The browser keeps a loading state while it waits.", readout: "GET /api/projects", node: 0 },
+  { title: "Cloud entry", label: "DNS · TLS · cloud network", detail: "DNS resolves the API hostname. The browser establishes a secure connection to the cloud endpoint. In this example, TLS terminates at the application load balancer; static frontend assets can be delivered separately through a CDN.", readout: "HTTPS → cloud endpoint", node: 1 },
+  { title: "Load balancer", label: "Health checks · request routing", detail: "The application load balancer checks its routing rules and forwards this request to one healthy backend replica. Multiple replicas share traffic; this example lets you choose A or B to inspect either path.", readout: "Route → healthy replica", node: 2 },
+  { title: "Docker + API", label: "Container · Node.js service", detail: "A running Docker container isolates the API process and its dependencies. The service checks authentication, validates the request, and runs application logic. Docker packages and runs the service; the load balancer routes the traffic.", readout: "Validate → execute handler", node: 3 },
+  { title: "Database", label: "Private network · persistent data", detail: "The API queries the database using server-side credentials and a connection pool. The database returns the requested records. The browser does not connect directly to this private database, and data persists separately from the API containers.", readout: "SELECT projects → records", node: 4 },
+  { title: "Response", label: "JSON · frontend render", detail: "The API serializes the result as JSON and returns it through the load balancer. The browser receives the response, clears its loading state, and React renders the project list. An error would take a separate error-handling path.", readout: "200 OK → JSON → UI", node: 0 },
+];
+export const stageDuration = 4200;

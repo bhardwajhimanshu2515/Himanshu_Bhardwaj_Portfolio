@@ -2,7 +2,7 @@
 import { useEffect, useRef, useState } from "react";
 import { PortfolioScene } from "./cinematic";
 import { CircuitBackground } from "./circuit-background";
-import { CallAnatomy } from "./call-anatomy";
+import { RequestAnatomy } from "./request-anatomy";
 import { Blogs } from "./blogs";
 import { RobotGuide } from "./robot-guide";
 import { useScrollChapters } from "./scroll-chapters";
@@ -128,7 +128,7 @@ function SystemExplorer() {
 function CommandPalette() {
   const ref = useRef(null);
   const [query, setQuery] = useState("");
-  const actions = [["Postline project", "#projects", "Navigate"], ["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Inside a mobile call", "#call-anatomy", "Navigate"], ["Blogs", "#blogs", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Medium blog", medium, "External"], ["Send an email", `mailto:${email}`, "Email"]];
+  const actions = [["Postline project", "#projects", "Navigate"], ["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Frontend to backend", "#request-anatomy", "Navigate"], ["Blogs", "#blogs", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Medium blog", medium, "External"], ["Send an email", `mailto:${email}`, "Email"]];
   const open = () => { setQuery(""); if (!ref.current.open) ref.current.showModal(); };
   useEffect(() => {
     const keydown = (event) => {
@@ -289,7 +289,7 @@ export default function Home() {
       </section>
       <EngineeringMethod />
       <section id="expertise" data-motion-chapter="expertise" className="section wrap two-column"><div className="section-aside"><span className="eyebrow">TECHNICAL EXPERTISE / 004</span><h2>Depth across<br />the <em>stack.</em></h2><p>Select a discipline to explore its tools and where I’ve applied them.</p><div className="discipline-map" aria-hidden="true"><span>UI</span><i /><span>API</span><i /><span>DB</span></div></div><div><StackWorkbench onLayer={setActiveLayer} /><div className="education"><div className="education-mark" aria-hidden="true">B.TECH<br /><span>CS / 2021</span></div><div><span className="eyebrow">FOUNDATION / EDUCATION</span><h3>B.Tech in Computer Science</h3><p>Poornima University</p><span className="education-date">August 2017 — June 2021</span></div></div></div></section>
-      <CallAnatomy />
+      <RequestAnatomy />
       <Blogs />
       <section id="contact" data-motion-chapter="contact" className={`contact wrap ${cinematicStyles.sceneSection}`}><figure className="contact-portrait"><img src="/himanshu-portrait.jpg" alt="Portrait of Himanshu Bhardwaj" width="640" height="800" loading="lazy" /><figcaption><b>Himanshu Bhardwaj</b><span>Senior Product Engineer · Noida</span></figcaption></figure><div><span className="eyebrow">NEXT CONNECTION / 005</span><h2>Complex problem?<br /><em>Let’s build<br />the solution.</em></h2><p>Tell me about your team, your product, and the engineering challenge ahead.</p><a className="button contact-cta" href={`mailto:${email}`}>Start a conversation ↗</a><div className="contact-location"><span aria-hidden="true">◎</span> NOIDA, INDIA / UTC +05:30</div></div><ConnectionPanel /></section>
     </main>
