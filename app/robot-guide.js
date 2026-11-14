@@ -13,6 +13,7 @@ const highlights = {
   experience: ["Production work", "See the outcomes behind my work on American Water, Claimocity, and Emplify.", "View experience", "#experience"],
   method: ["Engineering method", "See how I connect interface design, integration, validation, and iteration.", "Explore the method", "#engineering-method"],
   expertise: ["Technical expertise", "Explore the frontend, integration, and data tools I use across products.", "View expertise", "#expertise"],
+  blogs: ["Blogs", "Read my latest technology and engineering carousels.", "Explore blogs", "#blogs"],
   contact: ["Get in touch", "Tell me about your team, your product, and the engineering challenge ahead.", "View contact", "#contact"],
 };
 
