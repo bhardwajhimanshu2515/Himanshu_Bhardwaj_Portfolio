@@ -128,7 +128,7 @@ function SystemExplorer() {
 function CommandPalette() {
   const ref = useRef(null);
   const [query, setQuery] = useState("");
-  const actions = [["Postline project", "#projects", "Navigate"], ["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Blogs", "#blogs", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Medium blog", medium, "External"], ["Send an email", `mailto:${email}`, "Email"]];
+  const actions = [["Postline project", "#projects", "Navigate"], ["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Inside a mobile call", "#call-anatomy", "Navigate"], ["Blogs", "#blogs", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Medium blog", medium, "External"], ["Send an email", `mailto:${email}`, "Email"]];
   const open = () => { setQuery(""); if (!ref.current.open) ref.current.showModal(); };
   useEffect(() => {
     const keydown = (event) => {
@@ -217,21 +217,51 @@ function ThemeToggle() {
 export default function Home() {
   const [menu, setMenu] = useState(false);
   const mainRef = useRef(null);
+  const menuRef = useRef(null);
+  const [currentSection, setCurrentSection] = useState("overview");
+  useEffect(() => {
+    const sections = ["overview", "projects", "experience", "expertise", "blogs", "contact"]
+      .map(id => document.getElementById(id)).filter(Boolean);
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const threshold = window.innerHeight * .3;
+      const active = [...sections].reverse().find(section => section.getBoundingClientRect().top <= threshold);
+      setCurrentSection(active?.id || "overview");
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+    update();
+    window.addEventListener("scroll", schedule, { passive: true });
+    window.addEventListener("resize", schedule);
+    return () => { cancelAnimationFrame(frame); window.removeEventListener("scroll", schedule); window.removeEventListener("resize", schedule); };
+  }, []);
+  useEffect(() => {
+    if (!menu) return;
+    const dismiss = event => {
+      if (event.key === "Escape") { setMenu(false); menuRef.current?.focus(); }
+    };
+    const outside = event => { if (!event.target.closest(".header")) setMenu(false); };
+    const resize = () => { if (window.innerWidth > 1180) setMenu(false); };
+    window.addEventListener("keydown", dismiss);
+    window.addEventListener("pointerdown", outside);
+    window.addEventListener("resize", resize);
+    return () => { window.removeEventListener("keydown", dismiss); window.removeEventListener("pointerdown", outside); window.removeEventListener("resize", resize); };
+  }, [menu]);
   const [signal, setSignal] = useState(null);
   const [activeLayer, setActiveLayer] = useState(0);
   useFx3D();
   useScrollChapters(mainRef);
   return <>
-    <a className="skip" href="#overview">Skip to content</a>
+    <a className="skip" href="#main-content">Skip to content</a>
     <header className="header">
       <a className="brand" href="#overview" aria-label="Himanshu Bhardwaj home"><span className="brand-icon">h/</span> himanshu<span className="brand-extension">.dev</span></a>
-      <nav id="navigation" className={menu ? "open" : ""} aria-label="Main navigation">{["Overview","Projects","Experience","Expertise","Blogs","Contact"].map(name => <a key={name} href={`#${name.toLowerCase()}`} onClick={() => setMenu(false)}>{name}</a>)}</nav>
+      <nav id="navigation" className={menu ? "open" : ""} aria-label="Main navigation">{["Overview","Projects","Experience","Expertise","Blogs","Contact"].map(name => <a key={name} href={`#${name.toLowerCase()}`} aria-current={currentSection === name.toLowerCase() ? "location" : undefined} onClick={() => setMenu(false)}>{name}</a>)}</nav>
       <CommandPalette />
       <ThemeToggle />
       <a className="header-download" href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>Download résumé <span aria-hidden="true">↓</span></a>
-      <button className="menu-toggle" aria-expanded={menu} aria-controls="navigation" onClick={() => setMenu(!menu)}>{menu ? "Close" : "Menu"}</button>
+      <button ref={menuRef} className="menu-toggle" aria-expanded={menu} aria-controls="navigation" onClick={() => setMenu(!menu)}>{menu ? "Close" : "Menu"}</button>
     </header>
-    <main ref={mainRef}>
+    <main ref={mainRef} id="main-content" tabIndex={-1}>
       <PortfolioScene mainRef={mainRef} signal={signal} activeLayer={activeLayer} />
       <section id="overview" className={`wrap ${cinematicStyles.overview}`} data-motion-chapter="overview">
         <div className={cinematicStyles.opening}>

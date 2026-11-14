@@ -1,6 +1,7 @@
 import "./globals.css";
 import "./lab.css";
 import "./scroll-chapters.css";
+import "./portfolio-ux.css";
 import { PortfolioEntrance } from "./portfolio-entrance";
 
 const siteUrl = "https://himanshubhardwaj.com";

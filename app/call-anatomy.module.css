@@ -19,3 +19,9 @@
 .note a { text-decoration:underline;text-underline-offset:3px; }
 @media(max-width:700px) { .heading { display:block; }.heading p{margin-top:16px}.toolbar{align-items:start;flex-direction:column}.scene{height:370px}.steps{grid-template-columns:1fr 1fr}.steps button:last-child{grid-column:1/-1}.caption{min-height:210px} }
 @media(prefers-reduced-motion:reduce) { .steps button{transition:none} }
+/* Match shared type and touch-target scale. */
+.toolbar button { min-height:44px; font-size:12px; }
+.heading p,.caption p { font-size:16px; }
+.note { font-size:12px; }
+.steps button:focus-visible { outline-offset:-3px; }
+@media(max-width:700px) { .toolbar div{flex-wrap:wrap}.caption{min-height:240px} }
