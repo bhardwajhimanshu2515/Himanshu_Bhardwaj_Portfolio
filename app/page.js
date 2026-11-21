@@ -12,6 +12,19 @@ const linkedin = "https://www.linkedin.com/in/mern-full-stack-developer";
 const github = "https://github.com/bhardwajhimanshu2515";
 const medium = "https://medium.com/@bhardwajhimanshu2515";
 const postlineRepo = "https://github.com/bhardwajhimanshu2515/postline";
+const gaugeRepo = "https://github.com/Martin36/react-gauge-chart";
+const gaugeNpm = "https://www.npmjs.com/package/react-gauge-chart";
+const openSource = [
+  ["Nov 2026 — Present", "Maintainer", "react-gauge-chart", "npm · 270k+ monthly downloads", "Made a maintainer on npm and GitHub by the owner after 9 merged pull requests. Fixed re-render loops, server-side rendering crashes and needle animation bugs, and added opt-in props for needle clamping and arc labels, with no breaking changes for existing users. Every change was checked against the previous release's SVG output in React 17 and 18.", ["React", "D3.js", "SSR", "npm"], [["Package on npm", gaugeNpm], ["Repository", gaugeRepo]]],
+  ["Nov 2026", "Kernel contributor", "Linux kernel", "IIO subsystem · tools/iio", "Sent a C bug-fix patch so the IIO tools read channel-specific scale and offset values before generic ones. On sensors like the MAX31855 the old lookup could make ambient temperature readings four times too large. Reviewed and now with the IIO maintainers as v2.", ["C", "Linux", "git send-email"], []],
+  ["Nov 2026", "Contributor", "Nextcloud Forms · neo.mjs", "12 merged pull requests in total", "Merged fixes in Nextcloud Forms (keyboard focus when reordering options, backported to the stable branch) and neo.mjs, alongside the react-gauge-chart work.", ["Vue", "Accessibility", "JavaScript"], []],
+];
+function OpenSource() {
+  return <section id="open-source" data-motion-chapter="open-source" className="section wrap two-column" aria-labelledby="open-source-title">
+    <div className="section-aside"><span className="eyebrow">OPEN SOURCE / MAINTAINER</span><h2 id="open-source-title">Code other teams<br /><em>depend on.</em></h2><p>I maintain an npm package downloaded 270k+ times a month, and send fixes upstream, all the way down to the Linux kernel.</p><div className="career-summary"><strong>270k+</strong><span>MONTHLY NPM DOWNLOADS<br />REACT-GAUGE-CHART</span></div><a className="text-link" href={github} target="_blank" rel="noreferrer">See my GitHub ↗</a></div>
+    <div className="career-log"><div className="instrument-label"><span>OPEN SOURCE LOG</span><span>NEWEST FIRST</span></div>{openSource.map(([date,title,project,detail,text,tags,links], index) => <article className="role" key={project}><div className="role-meta"><span className="role-id">0{openSource.length-index}</span><span>{date}</span>{index === 0 && <span className="current">Maintainer</span>}</div><h3>{title}</h3><p className="company">{project}</p><span className="product"><span aria-hidden="true">▱ </span> {detail}</span><p className="role-description">{text}</p><div className="tags">{tags.map(tag => <span key={tag}>{tag}</span>)}</div>{links.length > 0 && <div className="actions">{links.map(([label,href]) => <a key={href} className="text-link" href={href} target="_blank" rel="noreferrer">{label} <span aria-hidden="true">↗</span></a>)}</div>}</article>)}</div>
+  </section>;
+}
 const fxTargets = [
   [".impact-strip > div", "flip"],
   [".projects-head", "up"], [".postline-copy > :not(h2)", "up"], [".promo-frame", "zoom"], [".promo figcaption", "up"], ["#projects-title", "zoom"], [".postline-flow", "right"],
@@ -128,7 +141,7 @@ function SystemExplorer() {
 function CommandPalette() {
   const ref = useRef(null);
   const [query, setQuery] = useState("");
-  const actions = [["Postline project", "#projects", "Navigate"], ["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Frontend to backend", "#request-anatomy", "Navigate"], ["Blogs", "#blogs", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Medium blog", medium, "External"], ["Send an email", `mailto:${email}`, "Email"]];
+  const actions = [["Postline project", "#projects", "Navigate"], ["Open source", "#open-source", "Navigate"], ["Experience", "#experience", "Navigate"], ["Technical expertise", "#expertise", "Navigate"], ["Frontend to backend", "#request-anatomy", "Navigate"], ["Blogs", "#blogs", "Navigate"], ["Contact", "#contact", "Navigate"], ["Download PDF résumé", "/Himanshu-Bhardwaj-Resume-2026.pdf", "Download"], ["Download Word résumé", "/Himanshu-Bhardwaj-Resume-2026.docx", "Download"], ["GitHub", github, "External"], ["LinkedIn", linkedin, "External"], ["Medium blog", medium, "External"], ["Send an email", `mailto:${email}`, "Email"]];
   const open = () => { setQuery(""); if (!ref.current.open) ref.current.showModal(); };
   useEffect(() => {
     const keydown = (event) => {
@@ -220,7 +233,7 @@ export default function Home() {
   const menuRef = useRef(null);
   const [currentSection, setCurrentSection] = useState("overview");
   useEffect(() => {
-    const sections = ["overview", "projects", "experience", "expertise", "blogs", "contact"]
+    const sections = ["overview", "projects", "open-source", "experience", "expertise", "blogs", "contact"]
       .map(id => document.getElementById(id)).filter(Boolean);
     let frame = 0;
     const update = () => {
@@ -255,7 +268,7 @@ export default function Home() {
     <a className="skip" href="#main-content">Skip to content</a>
     <header className="header">
       <a className="brand" href="#overview" aria-label="Himanshu Bhardwaj home"><span className="brand-icon">h/</span> himanshu<span className="brand-extension">.dev</span></a>
-      <nav id="navigation" className={menu ? "open" : ""} aria-label="Main navigation">{["Overview","Projects","Experience","Expertise","Blogs","Contact"].map(name => <a key={name} href={`#${name.toLowerCase()}`} aria-current={currentSection === name.toLowerCase() ? "location" : undefined} onClick={() => setMenu(false)}>{name}</a>)}</nav>
+      <nav id="navigation" className={menu ? "open" : ""} aria-label="Main navigation">{[["Overview","overview"],["Projects","projects"],["Open source","open-source"],["Experience","experience"],["Expertise","expertise"],["Blogs","blogs"],["Contact","contact"]].map(([name,id]) => <a key={id} href={`#${id}`} aria-current={currentSection === id ? "location" : undefined} onClick={() => setMenu(false)}>{name}</a>)}</nav>
       <CommandPalette />
       <ThemeToggle />
       <a className="header-download" href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>Download résumé <span aria-hidden="true">↓</span></a>
@@ -267,7 +280,7 @@ export default function Home() {
         <div className={cinematicStyles.opening}>
           <div className={cinematicStyles.openingCopy}>
             <h1>Himanshu Bhardwaj</h1>
-        <p className={cinematicStyles.role}>Senior Product Engineer at Smart Energy Water</p>
+        <p className={cinematicStyles.role}>Senior Product Engineer at Smart Energy Water · Maintainer of <a href="#open-source">react-gauge-chart</a></p>
         <p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p>
         <div className="actions">
           <a className="button" href="#projects">Explore projects <span aria-hidden="true">↓</span></a>
@@ -283,6 +296,7 @@ export default function Home() {
         <div className="lab-introduction"><span className="eyebrow">INSIDE THE WORK / 001</span><h2 id="lab-title">Systems thinking.<br /><em>Production proof.</em></h2><p>Explore the technologies and outcomes behind three products I helped build.</p><div className="lab-index"><span>01—03</span><p>UTILITIES<br />HEALTHCARE<br />HR TECHNOLOGY</p></div><a href="#experience" className="text-link">Read the engineering history ↗</a></div>
         <SystemExplorer />
       </section>
+      <OpenSource />
       <section id="experience" data-motion-chapter="experience" className="section wrap two-column">
         <div className="section-aside"><span className="eyebrow">ENGINEERING HISTORY / 002</span><h2>Production work.<br /><em>Proven impact.</em></h2><p>The products, teams, and technical challenges behind the numbers.</p><div className="career-map" aria-hidden="true"><span>2020</span><div><i /><i /><i /><i /><i /><i /></div><span>PRESENT</span></div><div className="career-summary"><strong>06</strong><span>ROLES<br />ONE CONTINUOUS JOURNEY</span></div><a className="text-link" href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>Download full résumé ↓</a></div>
         <div className="career-log"><div className="instrument-label"><span>EXPERIENCE LOG</span><span>NEWEST FIRST</span></div>{roles.map(([date,title,company,product,text,tags], index) => <article className="role" key={date}><div className="role-meta"><span className="role-id">0{roles.length-index}</span><span>{date}</span>{index === 0 && <span className="current">Current role</span>}</div><h3>{title}</h3><p className="company">{company}</p>{product && <span className="product"><span aria-hidden="true">▱ </span> {product}</span>}<p className="role-description">{text}</p><div className="tags">{tags.map(tag => <span key={tag}>{tag}</span>)}</div></article>)}</div>
