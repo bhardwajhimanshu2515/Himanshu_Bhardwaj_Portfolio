@@ -103,6 +103,8 @@ function Projects({ onSignal }) {
   </section>;
 }
 const roles = [
+  ["Nov 2026 — Present", "Open Source Maintainer", "react-gauge-chart (npm)", "270k+ monthly downloads", "Made an npm maintainer and GitHub collaborator by the owner after 9 merged pull requests to a React + D3 gauge library. Fixed re-render loops, server-side rendering crashes and needle animation bugs with no breaking changes for existing users.", ["React", "D3.js", "npm", "Open source"]],
+  ["Nov 2026", "Linux Kernel Contributor", "Linux kernel · IIO subsystem", "tools/iio", "Wrote a C bug fix so the IIO tools prefer channel-specific scale and offset values. Reviewed by Andy Shevchenko and accepted by maintainer Jonathan Cameron into iio.git for the next Linux release.", ["C", "Linux", "git send-email"]],
   ["Jan 2025 — Present", "Senior Product Engineer — Full Stack", "Smart Energy Water Pvt. Ltd.", "Alectra Builder", "Engineer scalable applications using React, Node.js and .NET integrations. Improve component reusability, streamline MongoDB and SQL interactions, resolve production issues, and strengthen code quality through automated testing.", ["React", "Node.js", ".NET", "MongoDB", "SQL"]],
   ["Aug 2023 — Jan 2025", "Product Engineer — Full Stack", "Smart Energy Water Pvt. Ltd.", "American Water", "Reduced application load time by 20% and improved development efficiency by 30% through reusable UI components. Integrated enterprise .NET APIs, reduced testing errors by 30% using Jest and Enzyme, and reduced system crashes by 25% through targeted debugging.", ["React", "Redux", "REST APIs", "Jest", "Enzyme"]],
   ["Mar 2022 — May 2023", "React.js Developer", "Global Healthcare & Billing Partners", "Claimocity", "Built healthcare billing experiences for web, iOS, and Android with Ionic React and TypeScript in a 10-member team. Developed Node.js REST APIs and optimized MongoDB queries, reducing API response time by 20%.", ["Ionic React", "TypeScript", "Node.js", "MongoDB"]],
@@ -115,6 +117,7 @@ const expertise = [
   ["Backend & integration", "Node.js, Express.js, REST APIs, .NET integration, GraphQL, AWS AppSync"],
   ["Data & persistence", "MongoDB, Mongoose, SQL, DynamoDB"],
   ["Quality & delivery", "Jest, Enzyme, Git, GitHub, CI/CD, Jira, Confluence, Scrum"],
+  ["Open source", "npm package maintenance, Linux kernel patches by email (git send-email), D3.js, C"],
 ];
 const systems = [
   { name: "American Water", domain: "Enterprise utilities", layers: [["INTERFACE", "React + Redux", "Reusable UI components"], ["INTEGRATION", ".NET / REST APIs", "Enterprise service integration"], ["VALIDATION", "Jest + Enzyme", "Automated component testing"]], result: "20%", label: "reduction in application load time", detail: "Optimized frontend performance, built reusable components, and debugged critical integrations.", metrics: [["30%", "higher development efficiency"], ["25%", "fewer system crashes"]] },
@@ -171,12 +174,13 @@ function StackWorkbench({ onLayer }) {
     ["Alectra Builder / Claimocity / Emplify", "REST and GraphQL APIs, enterprise .NET integrations, and connected third-party services.", "Client request → service integration → response"],
     ["Alectra Builder / Claimocity", "MongoDB query optimization and streamlined interactions across MongoDB and SQL.", "Application → query layer → persistence"],
     ["American Water / The Youth Project", "Component testing, critical-issue debugging, and deployment workflows with CI/CD.", "Implement → verify → release → improve"],
+    ["react-gauge-chart / Linux kernel / Nextcloud Forms / neo.mjs", "Maintaining an npm package with 270k+ monthly downloads, and a C fix accepted into the Linux kernel's IIO tree.", "Issue → fix → review → release"],
   ];
   return <div className="stack-workbench">
-    <div className="instrument-label"><span>CAPABILITY MAP</span><span>04 DOMAINS</span></div>
-    <div className="stack-selector" aria-label="Select an engineering discipline">{expertise.map(([title],index)=><button key={title} aria-pressed={selected===index} onClick={()=>{ setSelected(index); onLayer(index); }}><span>0{index+1}</span>{title}<b aria-hidden="true">↗</b></button>)}</div>
+    <div className="instrument-label"><span>CAPABILITY MAP</span><span>0{expertise.length} DOMAINS</span></div>
+    <div className="stack-selector" aria-label="Select an engineering discipline">{expertise.map(([title],index)=><button key={title} aria-pressed={selected===index} onClick={()=>{ setSelected(index); onLayer(Math.min(index, 3)); }}><span>0{index+1}</span>{title}<b aria-hidden="true">↗</b></button>)}</div>
     <div className="stack-inspector" key={selected}>
-      <div className="stack-heading"><span className="stack-symbol" aria-hidden="true">{["⌘","↔","▱","✓"][selected]}</span><div><span className="eyebrow">DISCIPLINE / 0{selected+1}</span><h3>{expertise[selected][0]}</h3></div></div>
+      <div className="stack-heading"><span className="stack-symbol" aria-hidden="true">{["⌘","↔","▱","✓","◎"][selected]}</span><div><span className="eyebrow">DISCIPLINE / 0{selected+1}</span><h3>{expertise[selected][0]}</h3></div></div>
       <div className="stack-chips">{expertise[selected][1].split(", ").map(skill=><span key={skill}>{skill}</span>)}</div>
       <div className="stack-flow">{contexts[selected][2]}</div>
       <p>{contexts[selected][1]}</p>
@@ -280,7 +284,7 @@ export default function Home() {
         <div className={cinematicStyles.opening}>
           <div className={cinematicStyles.openingCopy}>
             <h1>Himanshu Bhardwaj</h1>
-        <p className={cinematicStyles.role}>Senior Product Engineer at Smart Energy Water · Maintainer of <a href="#open-source">react-gauge-chart</a></p>
+        <p className={cinematicStyles.role}>Senior Product Engineer at Smart Energy Water · Maintainer of <a href="#open-source">react-gauge-chart</a> · <a href="#open-source">Linux kernel contributor</a></p>
         <p className="intro">I connect thoughtful interfaces with dependable systems. 5+ years building full-stack products across utilities, healthcare, and HR technology.</p>
         <div className="actions">
           <a className="button" href="#projects">Explore projects <span aria-hidden="true">↓</span></a>
@@ -298,8 +302,8 @@ export default function Home() {
       </section>
       <OpenSource />
       <section id="experience" data-motion-chapter="experience" className="section wrap two-column">
-        <div className="section-aside"><span className="eyebrow">ENGINEERING HISTORY / 002</span><h2>Production work.<br /><em>Proven impact.</em></h2><p>The products, teams, and technical challenges behind the numbers.</p><div className="career-map" aria-hidden="true"><span>2020</span><div><i /><i /><i /><i /><i /><i /></div><span>PRESENT</span></div><div className="career-summary"><strong>06</strong><span>ROLES<br />ONE CONTINUOUS JOURNEY</span></div><a className="text-link" href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>Download full résumé ↓</a></div>
-        <div className="career-log"><div className="instrument-label"><span>EXPERIENCE LOG</span><span>NEWEST FIRST</span></div>{roles.map(([date,title,company,product,text,tags], index) => <article className="role" key={date}><div className="role-meta"><span className="role-id">0{roles.length-index}</span><span>{date}</span>{index === 0 && <span className="current">Current role</span>}</div><h3>{title}</h3><p className="company">{company}</p>{product && <span className="product"><span aria-hidden="true">▱ </span> {product}</span>}<p className="role-description">{text}</p><div className="tags">{tags.map(tag => <span key={tag}>{tag}</span>)}</div></article>)}</div>
+        <div className="section-aside"><span className="eyebrow">ENGINEERING HISTORY / 002</span><h2>Production work.<br /><em>Proven impact.</em></h2><p>The products, teams, and technical challenges behind the numbers.</p><div className="career-map" aria-hidden="true"><span>2020</span><div><i /><i /><i /><i /><i /><i /></div><span>PRESENT</span></div><div className="career-summary"><strong>0{roles.length}</strong><span>ROLES<br />ONE CONTINUOUS JOURNEY</span></div><a className="text-link" href="/Himanshu-Bhardwaj-Resume-2026.pdf" download>Download full résumé ↓</a></div>
+        <div className="career-log"><div className="instrument-label"><span>EXPERIENCE LOG</span><span>NEWEST FIRST</span></div>{roles.map(([date,title,company,product,text,tags], index) => <article className="role" key={date}><div className="role-meta"><span className="role-id">0{roles.length-index}</span><span>{date}</span>{date.includes("Present") && <span className="current">Current role</span>}</div><h3>{title}</h3><p className="company">{company}</p>{product && <span className="product"><span aria-hidden="true">▱ </span> {product}</span>}<p className="role-description">{text}</p><div className="tags">{tags.map(tag => <span key={tag}>{tag}</span>)}</div></article>)}</div>
       </section>
       <EngineeringMethod />
       <section id="expertise" data-motion-chapter="expertise" className="section wrap two-column"><div className="section-aside"><span className="eyebrow">TECHNICAL EXPERTISE / 004</span><h2>Depth across<br />the <em>stack.</em></h2><p>Select a discipline to explore its tools and where I’ve applied them.</p><div className="discipline-map" aria-hidden="true"><span>UI</span><i /><span>API</span><i /><span>DB</span></div></div><div><StackWorkbench onLayer={setActiveLayer} /><div className="education"><div className="education-mark" aria-hidden="true">B.TECH<br /><span>CS / 2021</span></div><div><span className="eyebrow">FOUNDATION / EDUCATION</span><h3>B.Tech in Computer Science</h3><p>Poornima University</p><span className="education-date">August 2017 — June 2021</span></div></div></div></section>
