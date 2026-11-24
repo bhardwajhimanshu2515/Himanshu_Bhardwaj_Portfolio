@@ -5,6 +5,23 @@
     "title": "AI agents just found 2 new cracks in RSA-1024",
     "file": "2026-11-08-ai-agents-rsa-1024.pdf",
     "topic_summary": "Google DeepMind (6 Nov 2026): human-guided AI agents found two weaknesses in legacy 1024-bit RSA - signature forgery (~1,600x theoretical gain) and batch factoring (~30x cheaper per extra key). RSA-2048+ unaffected.",
-    "sources": ["Google DeepMind announcement, 6 Nov 2026", "https://cryptobriefing.com/google-deepmind-ai-rsa-1024-bit-weaknesses/", "https://www.webpronews.com/deepmind-ai-agents-legacy-1024-bit-rsa-weaknesses"]
+    "sources": [
+      "Google DeepMind announcement, 6 Nov 2026",
+      "https://cryptobriefing.com/google-deepmind-ai-rsa-1024-bit-weaknesses/",
+      "https://www.webpronews.com/deepmind-ai-agents-legacy-1024-bit-rsa-weaknesses"
+    ]
+  },
+  {
+    "date": "2026-11-24",
+    "slug": "cisco-openai-shirudo",
+    "title": "Cisco & OpenAI want to shield Linux before the patch lands",
+    "file": "2026-11-24-cisco-openai-shirudo.pdf",
+    "topic_summary": "Cisco and OpenAI (23 Nov 2026) open-sourced Shirudo, an eBPF-based rewrite of Tetragon that deploys signed, AI-generated 'shields' (mitigations) into running Linux kernels and workloads without reboot or restart, to cover the gap before vendor patches. Pre-release; demoed on Java4Shell in a live Elasticsearch 9.5.5.",
+    "sources": [
+      "Cisco press release, 23 Nov 2026: https://newsroom.cisco.com/c/r/newsroom/en/us/a/y2026/m11/cisco-and-openai-launch-shirudo-a-new-project-to-safeguard-agentic-ai.html",
+      "https://isovalent.com/blog/post/cisco-openai-shirudo",
+      "https://siliconangle.com/2026/11/23/cisco-and-openai-launch-shirudo-an-open-source-infrastructure-shield-to-protect-against-ai-driven-cyberattacks/",
+      "https://github.com/shirudo-dev/shirudo"
+    ]
   }
 ]
