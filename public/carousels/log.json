@@ -23,5 +23,17 @@
       "https://siliconangle.com/2026/11/23/cisco-and-openai-launch-shirudo-an-open-source-infrastructure-shield-to-protect-against-ai-driven-cyberattacks/",
       "https://github.com/shirudo-dev/shirudo"
     ]
+  },
+  {
+    "date": "2026-11-25",
+    "slug": "google-semantic-governance",
+    "title": "Google now asks your agent: did the user ask for this?",
+    "file": "2026-11-25-google-semantic-governance.pdf",
+    "topic_summary": "Google (23 Nov 2026) detailed Semantic governance policies, in Preview in Agent Gateway on the Gemini Enterprise Agent Platform: an LLM judge checks every proposed agent tool call against the user's intent and plain-language policies before it runs. On AgentDojo (gemini-2.5-flash) intent-hijacking attack success fell from 48.7% to 0.9% at ~2.6 points of benign utility.",
+    "sources": [
+      "https://developers.googleblog.com/did-the-user-ask-for-this-securing-ai-agents-against-intent-hijacking-with-semantic-governance-policies/",
+      "https://docs.cloud.google.com/gemini-enterprise-agent-platform/govern/policies/overview",
+      "https://www.helpnetsecurity.com/2026/11/23/google-semantic-governance-policies/"
+    ]
   }
 ]
